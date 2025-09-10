@@ -1,0 +1,6 @@
+# /public_html/uploads/.htaccess
+Options -ExecCGI
+AddType image/webp .webp
+<FilesMatch "\.(php|phar|phtml)$">
+  Require all denied
+</FilesMatch>

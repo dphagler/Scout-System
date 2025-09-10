@@ -1,0 +1,108 @@
+-- =========================
+-- Scouting System Schema (canonical)
+-- =========================
+-- Creates only the tables actually used by your server code:
+--  - teams
+--  - pit_records
+--  - match_records
+--  - matches_schedule
+--
+-- All CREATEs are idempotent. JSON columns use utf8mb4.
+
+-- -------------------------
+-- TEAMS (used by TBA import)
+-- -------------------------
+CREATE TABLE IF NOT EXISTS `teams` (
+  `id`            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `team_number`   INT UNSIGNED NOT NULL,
+  `nickname`      VARCHAR(255) NULL,
+  `name`          TEXT NULL,
+  `city`          VARCHAR(255) NULL,
+  `state_prov`    VARCHAR(128) NULL,
+  `country`       VARCHAR(128) NULL,
+  `rookie_year`   INT NULL,
+  `website`       VARCHAR(512) NULL,
+  `created_at_ms` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  UNIQUE KEY `uniq_team_number` (`team_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- -------------------------
+-- PIT RECORDS (written by api/sync.php)
+-- -------------------------
+CREATE TABLE IF NOT EXISTS `pit_records` (
+  `id`             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `event_key`      VARCHAR(64) NOT NULL,
+  `team_number`    INT UNSIGNED NOT NULL,
+
+  `drivetrain`     VARCHAR(255) NULL,
+  `weight_lb`      DECIMAL(6,2) NULL,
+  `dims_json`      JSON NULL,           -- {h,w,l}
+  `autos`          TEXT NULL,
+  `mechanisms_json` JSON NULL,          -- {"text": "..."} or legacy array
+  `notes`          TEXT NULL,
+
+  `photos_json`    JSON NULL,           -- ["https://.../file.webp", ...] (clean URLs)
+
+  `scout_name`     VARCHAR(255) NULL,
+  `device_id`      VARCHAR(255) NULL,
+  `created_at_ms`  BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  `schema_version` INT NULL,
+
+  INDEX (`event_key`),
+  INDEX (`team_number`),
+  INDEX (`created_at_ms`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- -------------------------
+-- MATCH RECORDS (written by api/sync.php)
+-- -------------------------
+CREATE TABLE IF NOT EXISTS `match_records` (
+  `id`             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `match_key`      VARCHAR(64) NOT NULL,    -- e.g., 2025gaalb_qm12
+  `alliance`       VARCHAR(8) NULL,         -- 'red'/'blue'
+  `position`       VARCHAR(8) NULL,         -- 'red1'..'blue3'
+  `team_number`    INT UNSIGNED NOT NULL,
+
+  `metrics_json`   JSON NULL,
+  `flags_json`     JSON NULL,
+
+  `penalties`      INT NULL,
+  `broke_down`     TINYINT(1) NULL,
+  `defense_played` TINYINT NULL,            -- 0–5
+  `defended_by`    TINYINT NULL,            -- 0–5
+  `driver_skill`   TINYINT NULL,            -- 1–5
+  `endgame`        VARCHAR(32) NULL,
+  `card`           VARCHAR(16) NULL,
+  `comments`       TEXT NULL,               -- notes live here (NOT in metrics_json)
+
+  `scout_name`     VARCHAR(255) NULL,
+  `device_id`      VARCHAR(255) NULL,
+  `created_at_ms`  BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  `schema_version` INT NULL,
+
+  UNIQUE KEY `uniq_match_team` (`match_key`, `team_number`),
+  INDEX (`team_number`),
+  INDEX (`created_at_ms`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- -------------------------
+-- MATCHES_SCHEDULE (official TBA schedule; written by tba_import.php)
+-- -------------------------
+CREATE TABLE IF NOT EXISTS `matches_schedule` (
+  `match_key`     VARCHAR(64)  NOT NULL,    -- PK, e.g., 2025gaalb_qm12
+  `event_key`     VARCHAR(32)  NOT NULL,
+  `comp_level`    VARCHAR(8)   NOT NULL,    -- e.g., 'qm','qf','sf','f'
+  `set_number`    INT          NOT NULL DEFAULT 0,
+  `match_number`  INT          NOT NULL DEFAULT 0,
+  `time_utc`      DATETIME     NULL,        -- normalized to UTC
+  `red1`          INT          NULL,
+  `red2`          INT          NULL,
+  `red3`          INT          NULL,
+  `blue1`         INT          NULL,
+  `blue2`         INT          NULL,
+  `blue3`         INT          NULL,
+  `field`         VARCHAR(64)  NULL,
+  PRIMARY KEY (`match_key`),
+  INDEX (`event_key`),
+  INDEX (`time_utc`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

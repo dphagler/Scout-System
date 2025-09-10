@@ -1,0 +1,13 @@
+RewriteEngine On
+RewriteBase /scout/
+
+# Don’t touch real files or folders (icons, manifest, assets)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# SPA fallback
+RewriteRule . /scout/index.html [L]
+
+# Serve manifest correctly
+AddType application/manifest+json .webmanifest
