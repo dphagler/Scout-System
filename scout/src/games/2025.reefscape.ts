@@ -35,12 +35,11 @@ export const GAME_2025: GameConfig = {
         {
           kind: 'select',
           key: 'endgame_climb',
-          label: 'Climb',
+          label: 'Endgame',
           options: [
             { value: 'none',   label: 'None' },
-            { value: 'low',    label: 'Low' },
-            { value: 'mid',    label: 'Mid' },
-            { value: 'high',   label: 'High' }
+            { value: 'low',    label: 'Shallow' },
+            { value: 'mid',    label: 'Deep' }
           ]
         },
         { kind: 'toggle', key: 'coop', label: 'Coopertition Achieved' }
