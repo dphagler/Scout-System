@@ -20,7 +20,8 @@ try {
   }
 
   // ---- Params ----
-  $event = isset($_GET['event']) ? strtolower(trim($_GET['event'])) : '';
+  $event = isset($_GET['event']) ? trim($_GET['event']) : '';
+  $event = preg_replace('~[^a-z0-9_]~', '', strtolower($event));
   $team  = isset($_GET['team'])  ? intval($_GET['team']) : 0;
   $nameQ = isset($_GET['name'])  ? trim($_GET['name']) : '';
 
@@ -64,7 +65,12 @@ try {
     }
   }
 
-  $targetPath = $targetDir . '/' . $safe;
+  $realTargetDir = realpath($targetDir);
+  if ($realTargetDir === false || strpos($realTargetDir, $UPLOADS_DIR) !== 0) {
+    throw new Exception('invalid_target_dir');
+  }
+
+  $targetPath = $realTargetDir . '/' . $safe;
 
   // ---- Read body/file ----
   $content = null;
