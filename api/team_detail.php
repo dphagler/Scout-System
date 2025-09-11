@@ -96,7 +96,7 @@ try {
   $endgamePct = [];
   try {
     $stmt = $pdo->prepare("
-      SELECT flags_json, endgame
+      SELECT metrics_json
       FROM match_records
       WHERE team_number = ?
         AND match_key LIKE CONCAT(?, '_%')
@@ -105,27 +105,42 @@ try {
     $rows = $stmt->fetchAll();
     $cnt = max(1, count($rows));
     foreach ($rows as $r) {
+      $mj = $r['metrics_json'] ?? null;
+      if (!$mj) continue;
+      $obj = is_string($mj) ? json_decode($mj, true) : $mj;
+      if (!is_array($obj)) continue;
+
       // endgame
-      $eg = $r['endgame'] ?? null;
-      if ($eg) {
-        $k = strtolower(trim($eg));
+      $eg = null;
+      if (isset($obj['endgame'])) { $eg = $obj['endgame']; }
+      elseif (isset($obj['endgame_climb'])) { $eg = $obj['endgame_climb']; }
+      elseif (isset($obj['endgame_status'])) { $eg = $obj['endgame_status']; }
+      if ($eg !== null && $eg !== '') {
+        $k = strtolower(trim((string)$eg));
         $endgamePct[$k] = ($endgamePct[$k] ?? 0) + 1;
       }
+
       // flags
-      $fj = $r['flags_json'] ?? null;
-      if ($fj) {
-        $obj = is_string($fj) ? json_decode($fj, true) : $fj;
-        if (is_array($obj)) {
-          foreach ($obj as $k => $v) {
-            if ($v) $flagsPct[$k] = ($flagsPct[$k] ?? 0) + 1;
+      foreach ($obj as $k => $v) {
+        if (in_array($k, ['endgame', 'endgame_climb', 'endgame_status'], true)) continue;
+        $flag = null;
+        if (is_bool($v)) {
+          $flag = $v;
+        } elseif (is_numeric($v)) {
+          if ($v == 0 || $v == 1) { $flag = ($v != 0); }
+        } elseif (is_string($v)) {
+          $vl = strtolower($v);
+          if (in_array($vl, ['true','false','1','0','yes','no','y','n','t','f'], true)) {
+            $flag = in_array($vl, ['true','1','yes','y','t'], true);
           }
         }
+        if ($flag) { $flagsPct[$k] = ($flagsPct[$k] ?? 0) + 1; }
       }
     }
     foreach ($endgamePct as $k => $v) { $endgamePct[$k] = round($v * 1000 / $cnt) / 10; }
     foreach ($flagsPct   as $k => $v) { $flagsPct[$k]   = round($v * 1000 / $cnt) / 10; }
   } catch (Throwable $__) {
-    // If columns are missing (modern schema), keep empty aggregates
+    // If metrics_json column missing or other errors, keep empty aggregates
     $flagsPct = [];
     $endgamePct = [];
   }
