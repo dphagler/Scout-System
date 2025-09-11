@@ -16,9 +16,9 @@ export type Settings = {
 
 // ---------- hardening fallbacks (used only if envs are empty) ----------
 const FALLBACKS = {
-  EVENT_KEY: '2025gaalb',
-  SYNC_URL:  'https://www.commodorerobotics.com/api', // we normalize anyway
-  API_KEY:   '123456789abcdefg11'
+  EVENT_KEY: '',
+  SYNC_URL:  '',
+  API_KEY:   ''
 }
 
 // ---------- helpers ----------
@@ -52,8 +52,8 @@ function ensureDeviceId(existing?: string): string {
  */
 export function normalizeSettings(current: Partial<Settings>): Settings {
   // Read envs (may be empty in some deployments)
-  const envSync = (import.meta.env && (import.meta.env as any).VITE_SYNC_URL) || ''
-  const envKey  = (import.meta.env && (import.meta.env as any).VITE_API_KEY)  || ''
+  const envSync = ''
+  const envKey  = ''
   const envEvt  = (import.meta.env && (import.meta.env as any).VITE_EVENT_KEY) || ''
 
   // Pick values in priority: current → env → fallback

@@ -14,41 +14,48 @@ export default function App() {
   const [settings, setSettings] = React.useState<any>(defaultSettings)
   const [syncBusy, setSyncBusy] = React.useState(false)
   const [syncHint, setSyncHint] = React.useState<string>('')
+  const [envDefaults, setEnvDefaults] = React.useState({
+    eventKey: import.meta.env.VITE_EVENT_KEY || '',
+    syncUrl: '',
+    apiKey: ''
+  })
 
   // Load saved settings once — and force-merge env defaults into blanks
   React.useEffect(() => {
-    const envDefaults = {
-      eventKey: import.meta.env.VITE_EVENT_KEY || '',
-      syncUrl:  import.meta.env.VITE_SYNC_URL  || '',
-      apiKey:   import.meta.env.VITE_API_KEY   || ''
-    }
+    (async () => {
+      let defaults = { eventKey: import.meta.env.VITE_EVENT_KEY || '', syncUrl: '', apiKey: '' }
+      try {
+        const res = await fetch('/api/client-config.php')
+        if (res.ok) {
+          const cfg = await res.json()
+          defaults = { ...defaults, syncUrl: cfg.syncUrl || '', apiKey: cfg.apiKey || '' }
+        }
+      } catch {}
 
-    function fillBlanks(obj: any) {
-      const out = { ...obj }
-      if (!out.eventKey) out.eventKey = envDefaults.eventKey
-      if (!out.syncUrl)  out.syncUrl  = envDefaults.syncUrl
-      if (!out.apiKey)   out.apiKey   = envDefaults.apiKey
-      return out
-    }
+      setEnvDefaults(defaults)
 
-    try {
-      const saved = localStorage.getItem('scout:settings')
-      const parsed = saved ? JSON.parse(saved) : {}
-      const merged = normalizeSettings(fillBlanks(parsed))
-      setSettings(merged)
-    } catch {
-      setSettings(normalizeSettings(fillBlanks({})))
-    }
+      function fillBlanks(obj: any) {
+        const out = { ...obj }
+        if (!out.eventKey) out.eventKey = defaults.eventKey
+        if (!out.syncUrl)  out.syncUrl  = defaults.syncUrl
+        if (!out.apiKey)   out.apiKey   = defaults.apiKey
+        return out
+      }
+
+      try {
+        const saved = localStorage.getItem('scout:settings')
+        const parsed = saved ? JSON.parse(saved) : {}
+        const merged = normalizeSettings(fillBlanks(parsed))
+        setSettings(merged)
+      } catch {
+        setSettings(normalizeSettings(fillBlanks({})))
+      }
+    })()
   }, [])
 
   // Persist settings on change (normalize again to be safe)
   React.useEffect(() => {
     try {
-      const envDefaults = {
-        eventKey: import.meta.env.VITE_EVENT_KEY || '',
-        syncUrl:  import.meta.env.VITE_SYNC_URL  || '',
-        apiKey:   import.meta.env.VITE_API_KEY   || ''
-      }
       const filled = {
         ...settings,
         eventKey: settings.eventKey || envDefaults.eventKey,
@@ -59,7 +66,7 @@ export default function App() {
       localStorage.setItem('scout:settings', JSON.stringify(norm))
       if (JSON.stringify(norm) !== JSON.stringify(settings)) setSettings(norm)
     } catch {}
-  }, [settings])
+  }, [settings, envDefaults])
 
   // Hidden admin via ?admin=1
   React.useEffect(() => {

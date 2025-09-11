@@ -9,6 +9,10 @@ $DB_NAME = getenv('DB_NAME') ?: '';
 $DB_USER = getenv('DB_USER') ?: '';
 $DB_PASS = getenv('DB_PASS') ?: '';
 
+// External endpoints
+$SYNC_URL = getenv('SYNC_URL') ?: '';
+$API_BASE = getenv('API_BASE') ?: '';
+
 // Allowed origins for CORS
 $CORS_ALLOWED_ORIGINS = [
   'https://www.commodorerobotics.com',
