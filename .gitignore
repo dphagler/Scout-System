@@ -1,5 +1,4 @@
 # Build artifacts
 dist/
-api/
 node_modules/
 uploads/
