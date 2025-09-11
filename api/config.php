@@ -1,5 +1,4 @@
 <?php
-// --- Base config (safe defaults). Override via environment variables or config.local.php ---
 
 $API_KEY = getenv('API_KEY') ?: '';
 $TBA_KEY = getenv('TBA_KEY') ?: '';
