@@ -14,7 +14,7 @@ header('Content-Type: application/json; charset=utf-8');
 try {
   $clientKey = client_api_key();
   global $API_KEY;
-  if (isset($API_KEY) && $API_KEY && $clientKey && !hash_equals($API_KEY, $clientKey)) {
+  if (isset($API_KEY) && $API_KEY && (!$clientKey || !hash_equals($API_KEY, $clientKey))) {
     http_response_code(401);
     echo json_encode(['ok' => false, 'error' => 'unauthorized']); exit;
   }
