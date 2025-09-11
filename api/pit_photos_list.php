@@ -18,25 +18,28 @@ try {
     echo json_encode(['ok'=>false,'error'=>'missing_params']); exit;
   }
 
-  $root = dirname(__DIR__); // server/
-  $dir  = $root . '/uploads/pit';
+  $root   = dirname(__DIR__); // server/
+  $base   = $root . '/uploads/pit';
   $photos = [];
 
+  $safeEvent = preg_replace('~[^a-z0-9_]~', '', $event);
+  $teamInt   = (int)$team;
+  $dir       = $base . '/' . $safeEvent . '/' . $teamInt;
+
   if (is_dir($dir)) {
-    $safeEvent = preg_replace('~[^a-z0-9_]~', '', $event);
-    $pattern   = sprintf('%s/%s_%d_*.*', $dir, $safeEvent, (int)$team);
-    $matches   = glob($pattern);
-    sort($matches); // deterministic order
-    $scheme    = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host      = $_SERVER['HTTP_HOST'] ?? '';
-    foreach ($matches as $path) {
-      $url = $scheme . '://' . $host . '/uploads/pit/' . basename($path);
-      $photos[] = $url;
+    $files  = glob($dir . '/*.*');
+    sort($files); // deterministic order
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    foreach ($files as $path) {
+      if (!is_file($path)) { continue; }
+      $rel = '/uploads/pit/' . rawurlencode($safeEvent) . '/' . rawurlencode((string)$teamInt) . '/' . rawurlencode(basename($path));
+      $photos[] = $scheme . '://' . $host . $rel;
       if (count($photos) >= 3) break;
     }
   }
 
-  echo json_encode(['ok'=>true, 'photos'=>$photos]);
+  echo json_encode(['ok'=>true, 'photos'=>$photos], JSON_UNESCAPED_SLASHES);
 } catch (Throwable $e) {
   http_response_code(500);
   echo json_encode(['ok'=>false,'error'=>'exception','details'=>$e->getMessage()]);
