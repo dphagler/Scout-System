@@ -70,9 +70,9 @@ try {
       COUNT(*)                           AS played,
       AVG(NULLIF(penalties, NULL))       AS penalties_avg,
       AVG(NULLIF(driver_skill, NULL))    AS driver_skill_avg,
-      AVG(NULLIF(broke_down, NULL))      AS broke_down_avg,
-      AVG(NULLIF(defended_by, NULL))     AS defended_by_avg,
-      AVG(NULLIF(defense_played, NULL))  AS defense_played_avg
+      AVG(COALESCE(broke_down, 0))       AS broke_down_avg,
+      AVG(COALESCE(defended_by, 0))      AS defended_by_avg,
+      AVG(COALESCE(defense_played, 0))   AS defense_played_avg
     FROM match_records
     WHERE team_number = ?
       AND match_key LIKE CONCAT(?, '_%')
@@ -156,9 +156,9 @@ try {
     'played' => intval($agg['played'] ?? 0),
     'penalties_avg' => $agg['penalties_avg'] !== null ? floatval($agg['penalties_avg']) : null,
     'driver_skill_avg' => $agg['driver_skill_avg'] !== null ? floatval($agg['driver_skill_avg']) : null,
-    'broke_down_avg' => $agg['broke_down_avg'] !== null ? floatval($agg['broke_down_avg']) : null,
-    'defended_by_avg' => $agg['defended_by_avg'] !== null ? floatval($agg['defended_by_avg']) : null,
-    'defense_played_avg' => $agg['defense_played_avg'] !== null ? floatval($agg['defense_played_avg']) : null,
+    'broke_down_avg' => floatval($agg['broke_down_avg'] ?? 0),
+    'defended_by_avg' => floatval($agg['defended_by_avg'] ?? 0),
+    'defense_played_avg' => floatval($agg['defense_played_avg'] ?? 0),
     'cards' => $cards,
     'flags_pct' => (object)$flagsPct,
     'endgame_pct' => (object)$endgamePct

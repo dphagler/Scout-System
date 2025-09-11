@@ -335,6 +335,20 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
     return v
   }
 
+  function formatStation(alliance?: string|null, position?: any) {
+    const posStr = position !== undefined && position !== null ? String(position) : ''
+    const match = posStr.match(/^(red|blue)(\d)$/i)
+    if (match) {
+      const color = match[1]
+      const num = match[2]
+      return `${color.charAt(0).toUpperCase()}${color.slice(1)} ${num}`
+    }
+    const alli = alliance ? String(alliance) : ''
+    if (alli && posStr) return `${alli.charAt(0).toUpperCase()}${alli.slice(1)} ${posStr}`
+    if (alli) return `${alli.charAt(0).toUpperCase()}${alli.slice(1)}`
+    return posStr || '-'
+  }
+
   const pit = detail?.pit || null
   const dims = parseJsonMaybe(pit?.dims_json)
   const mechs = parseJsonMaybe(pit?.mechanisms_json)
@@ -369,7 +383,7 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
                 {(detail?.recent || []).map((m:any, i:number) => (
                   <li key={i} className="help">
                     <a href={`https://www.statbotics.io/match/${m.match_key}`} target="_blank" rel="noopener noreferrer">{m.match_key}</a>
-                    {` · ${m.alliance || '-'}${m.position || ''}`}
+                    {` · ${formatStation(m.alliance, m.position)}`}
                   </li>
                 ))}
               </ul>
