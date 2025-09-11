@@ -46,6 +46,7 @@ try {
         $metricsKeys[$k] = true;
       }
     }
+    // flags_json is legacy; tolerate missing
     $f = json_decode($r['flags_json'] ?? "{}", true);
     if (is_array($f)) {
       foreach ($f as $k=>$v) {
@@ -56,9 +57,20 @@ try {
     }
     $teamsAgg[$tnum]['penalties_sum'] += (int)($r['penalties'] ?? 0);
 
-    $eg = $r['endgame'] ?? 'none';
-    if (!isset($teamsAgg[$tnum]['endgame'][$eg])) $teamsAgg[$tnum]['endgame'][$eg] = 0;
-    $teamsAgg[$tnum]['endgame'][$eg] += 1;
+    // Derive endgame label from metrics_json if column is missing
+    $eg = null;
+    if (array_key_exists('endgame', $r)) {
+      $eg = $r['endgame'];
+    }
+    if ($eg === null && is_array($m)) {
+      if (isset($m['endgame'])) { $eg = is_string($m['endgame']) ? $m['endgame'] : (string)$m['endgame']; }
+      elseif (isset($m['end'])) { $eg = is_string($m['end']) ? $m['end'] : (string)$m['end']; }
+      elseif (isset($m['climb'])) { $eg = is_string($m['climb']) ? $m['climb'] : (string)$m['climb']; }
+    }
+    if ($eg !== null && $eg !== '') {
+      if (!isset($teamsAgg[$tnum]['endgame'][$eg])) $teamsAgg[$tnum]['endgame'][$eg] = 0;
+      $teamsAgg[$tnum]['endgame'][$eg] += 1;
+    }
 
     $card = $r['card'] ?? 'none';
     if (!isset($teamsAgg[$tnum]['card'][$card])) $teamsAgg[$tnum]['card'][$card] = 0;
@@ -70,7 +82,7 @@ try {
 
     $recent[] = [
       'match_key' => $r['match_key'], 'team_number' => $tnum, 'alliance' => $r['alliance'],
-      'position' => (int)$r['position'], 'metrics' => $m, 'endgame' => $eg, 'card' => $card,
+      'position' => (int)$r['position'], 'metrics' => $m, 'endgame' => ($eg ?? null), 'card' => $card,
       'penalties' => (int)($r['penalties'] ?? 0), 'scout_name' => $r['scout_name'] ?? null,
       'created_at_ms' => (int)($r['created_at_ms'] ?? 0),
     ];

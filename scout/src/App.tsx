@@ -1,12 +1,13 @@
 import React from 'react'
 import MatchForm from './pages/MatchForm'
 import PitForm from './pages/PitForm'
+import Dashboard from './pages/Dashboard'
 import { SettingsContext, defaultSettings, normalizeSettings, toApiBase } from './settings'
 import { getAll } from './db'
 import type { PitRecord, MatchRecord } from './db'
 import { refreshTeamsCache as refreshTeamsCacheUtil, refreshScheduleCache as refreshScheduleCacheUtil, syncUnsynced } from './sync'
 
-type Tab = 'match' | 'pit' | 'admin'
+type Tab = 'match' | 'pit' | 'dash' | 'admin'
 
 export default function App() {
   const [tab, setTab] = React.useState<Tab>('match')
@@ -186,6 +187,7 @@ export default function App() {
       <div className="nav">
         <button className={`tab ${tab === 'match' ? 'active' : ''}`} onClick={() => setTab('match')}>Match</button>
         <button className={`tab ${tab === 'pit' ? 'active' : ''}`} onClick={() => setTab('pit')}>Pit</button>
+        <button className={`tab ${tab === 'dash' ? 'active' : ''}`} onClick={() => setTab('dash')}>Dashboard</button>
 
         <div className="spacer" />
 
@@ -201,6 +203,7 @@ export default function App() {
 
       {tab === 'match' && <MatchForm />}
       {tab === 'pit' && <PitForm />}
+      {tab === 'dash' && <Dashboard />}
 
       {/* Admin page (hidden from nav). Open with ?admin=1 */}
       {tab === 'admin' && (

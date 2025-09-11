@@ -147,25 +147,23 @@ if (!empty($match)) {
   $stmtMatch = $pdo->prepare("
     INSERT INTO match_records
       (match_key, alliance, position, team_number,
-       metrics_json, flags_json,
-       penalties, broke_down, defense_played, defended_by, driver_skill, endgame, card, comments,
+       metrics_json,
+       penalties, broke_down, defense_played, defended_by, driver_skill, card, comments,
        scout_name, device_id, created_at_ms, schema_version)
     VALUES
       (:match_key, :alliance, :position, :team_number,
-       :metrics_json, :flags_json,
-       :penalties, :broke_down, :defense_played, :defended_by, :driver_skill, :endgame, :card, :comments,
+       :metrics_json,
+       :penalties, :broke_down, :defense_played, :defended_by, :driver_skill, :card, :comments,
        :scout_name, :device_id, :created_at_ms, :schema_version)
     ON DUPLICATE KEY UPDATE
        alliance        = VALUES(alliance),
        position        = VALUES(position),
        metrics_json    = VALUES(metrics_json),
-       flags_json      = VALUES(flags_json),
        penalties       = VALUES(penalties),
        broke_down      = VALUES(broke_down),
        defense_played  = VALUES(defense_played),
        defended_by     = VALUES(defended_by),
        driver_skill    = VALUES(driver_skill),
-       endgame         = VALUES(endgame),
        card            = VALUES(card),
        comments        = VALUES(comments),
        scout_name      = VALUES(scout_name),
@@ -192,14 +190,11 @@ if (!empty($match)) {
     }
     $metrics_json = jenc($metrics);
 
-    $flags_json   = jenc($r['flags'] ?? null);
-
     $penalties    = to_int($r['penalties'] ?? 0);
     $broke_down   = to_bool01($r['brokeDown'] ?? 0);
     $def_played   = to_int($r['defensePlayed'] ?? 0);
     $def_by       = to_int($r['defendedBy'] ?? 0);
     $driver_skill = to_int($r['driverSkill'] ?? 0);
-    $endgame      = to_str_or_null($r['endgame'] ?? null);
     $card         = to_str_or_null($r['card'] ?? null);
     $comments     = to_str_or_null($r['comments'] ?? null);
 
@@ -214,13 +209,11 @@ if (!empty($match)) {
       ':position'       => $position,
       ':team_number'    => $team_number,
       ':metrics_json'   => $metrics_json,
-      ':flags_json'     => $flags_json,
       ':penalties'      => $penalties,
       ':broke_down'     => $broke_down,
       ':defense_played' => $def_played,
       ':defended_by'    => $def_by,
       ':driver_skill'   => $driver_skill,
-      ':endgame'        => $endgame,
       ':card'           => $card,
       ':comments'       => $comments,
       ':scout_name'     => $scout_name,

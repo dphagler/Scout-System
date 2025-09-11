@@ -41,8 +41,8 @@ try {
   // --- Recent matches for this team at this event (latest first, up to 10)
   $stmt = $pdo->prepare("
     SELECT match_key, alliance, position, team_number,
-           metrics_json, flags_json, penalties, broke_down,
-           defense_played, defended_by, driver_skill, endgame, card,
+           metrics_json, penalties, broke_down,
+           defense_played, defended_by, driver_skill, card,
            comments, scout_name, device_id, created_at_ms, schema_version
     FROM match_records
     WHERE team_number = ?
@@ -52,6 +52,21 @@ try {
   ");
   $stmt->execute([$team, $event]);
   $recent = $stmt->fetchAll() ?: [];
+  // Derive simple 'endgame' label from metrics_json if available
+  foreach ($recent as &$rec) {
+    $eg = null;
+    $mj = $rec['metrics_json'] ?? null;
+    if ($mj) {
+      $m = is_string($mj) ? json_decode($mj, true) : $mj;
+      if (is_array($m)) {
+        if (isset($m['endgame'])) { $eg = is_string($m['endgame']) ? $m['endgame'] : (string)$m['endgame']; }
+        elseif (isset($m['end'])) { $eg = is_string($m['end']) ? $m['end'] : (string)$m['end']; }
+        elseif (isset($m['climb'])) { $eg = is_string($m['climb']) ? $m['climb'] : (string)$m['climb']; }
+      }
+    }
+    $rec['endgame'] = $eg;
+  }
+  unset($rec);
 
   // --- Aggregate (light) — penalties & driver skill averages
   $stmt = $pdo->prepare("
@@ -66,38 +81,44 @@ try {
   $stmt->execute([$team, $event]);
   $agg = $stmt->fetch() ?: ['played'=>0,'penalties_avg'=>null,'driver_skill_avg'=>null];
 
-  // --- Endgame & flags percentages (optional, tolerate missing/invalid JSON)
+  // --- Endgame & flags percentages (optional; tolerate missing/legacy schemas)
   $flagsPct = [];
   $endgamePct = [];
-  $stmt = $pdo->prepare("
-    SELECT flags_json, endgame
-    FROM match_records
-    WHERE team_number = ?
-      AND match_key LIKE CONCAT(?, '_%')
-  ");
-  $stmt->execute([$team, $event]);
-  $rows = $stmt->fetchAll();
-  $cnt = max(1, count($rows));
-  foreach ($rows as $r) {
-    // endgame
-    $eg = $r['endgame'] ?? null;
-    if ($eg) {
-      $k = strtolower(trim($eg));
-      $endgamePct[$k] = ($endgamePct[$k] ?? 0) + 1;
-    }
-    // flags
-    $fj = $r['flags_json'] ?? null;
-    if ($fj) {
-      $obj = is_string($fj) ? json_decode($fj, true) : $fj;
-      if (is_array($obj)) {
-        foreach ($obj as $k => $v) {
-          if ($v) $flagsPct[$k] = ($flagsPct[$k] ?? 0) + 1;
+  try {
+    $stmt = $pdo->prepare("
+      SELECT flags_json, endgame
+      FROM match_records
+      WHERE team_number = ?
+        AND match_key LIKE CONCAT(?, '_%')
+    ");
+    $stmt->execute([$team, $event]);
+    $rows = $stmt->fetchAll();
+    $cnt = max(1, count($rows));
+    foreach ($rows as $r) {
+      // endgame
+      $eg = $r['endgame'] ?? null;
+      if ($eg) {
+        $k = strtolower(trim($eg));
+        $endgamePct[$k] = ($endgamePct[$k] ?? 0) + 1;
+      }
+      // flags
+      $fj = $r['flags_json'] ?? null;
+      if ($fj) {
+        $obj = is_string($fj) ? json_decode($fj, true) : $fj;
+        if (is_array($obj)) {
+          foreach ($obj as $k => $v) {
+            if ($v) $flagsPct[$k] = ($flagsPct[$k] ?? 0) + 1;
+          }
         }
       }
     }
+    foreach ($endgamePct as $k => $v) { $endgamePct[$k] = round($v * 1000 / $cnt) / 10; }
+    foreach ($flagsPct   as $k => $v) { $flagsPct[$k]   = round($v * 1000 / $cnt) / 10; }
+  } catch (Throwable $__) {
+    // If columns are missing (modern schema), keep empty aggregates
+    $flagsPct = [];
+    $endgamePct = [];
   }
-  foreach ($endgamePct as $k => $v) { $endgamePct[$k] = round($v * 1000 / $cnt) / 10; }
-  foreach ($flagsPct   as $k => $v) { $flagsPct[$k]   = round($v * 1000 / $cnt) / 10; }
 
   // --- Ensure pit photos have correct PUBLIC path if photos_json is empty and files exist
   // We DO NOT assume /server/uploads here; public path is /uploads/...
