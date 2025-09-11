@@ -53,7 +53,7 @@ function ensureDeviceId(existing?: string): string {
 export function normalizeSettings(current: Partial<Settings>): Settings {
   // Read envs (may be empty in some deployments)
   const envSync = ''
-  const envKey  = ''
+  const envKey  = (import.meta.env && (import.meta.env as any).VITE_API_KEY) || ''
   const envEvt  = (import.meta.env && (import.meta.env as any).VITE_EVENT_KEY) || ''
 
   // Pick values in priority: current → env → fallback

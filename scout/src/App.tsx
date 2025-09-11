@@ -17,18 +17,18 @@ export default function App() {
   const [envDefaults, setEnvDefaults] = React.useState({
     eventKey: import.meta.env.VITE_EVENT_KEY || '',
     syncUrl: '',
-    apiKey: ''
+    apiKey: import.meta.env.VITE_API_KEY || ''
   })
 
   // Load saved settings once — and force-merge env defaults into blanks
   React.useEffect(() => {
     (async () => {
-      let defaults = { eventKey: import.meta.env.VITE_EVENT_KEY || '', syncUrl: '', apiKey: '' }
+      let defaults = { eventKey: import.meta.env.VITE_EVENT_KEY || '', syncUrl: '', apiKey: import.meta.env.VITE_API_KEY || '' }
       try {
         const res = await fetch('/api/client-config.php')
         if (res.ok) {
           const cfg = await res.json()
-          defaults = { ...defaults, syncUrl: cfg.syncUrl || '', apiKey: cfg.apiKey || '' }
+          defaults = { ...defaults, syncUrl: cfg.syncUrl || '' }
         }
       } catch {}
 
