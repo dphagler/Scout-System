@@ -123,7 +123,7 @@ try {
         $select_pct[$k][$val] = round(100.0*$cnt/$played,1);
       }
     }
-    $end_pct = $select_pct['endgame'] ?? $select_pct['endgame_climb'] ?? [];
+    $end_pct = $select_pct['endgame'] ?? $select_pct['endgame_climb'] ?? $select_pct['endgame_status'] ?? [];
     $card_pct = []; foreach ($agg['card'] as $k=>$cnt) { $card_pct[$k] = round(100.0*$cnt/$played,1); }
 
     $teams[] = [
