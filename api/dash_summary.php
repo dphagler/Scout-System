@@ -40,7 +40,12 @@ try {
 
     $m = json_decode($r['metrics_json'] ?? "{}", true);
     if (is_array($m)) {
-      foreach ($m as $k=>$v) { if (!is_numeric($v)) continue;
+      foreach ($m as $k=>$v) {
+        // Allow boolean metrics (toggles) by treating true/false as 1/0
+        if (is_bool($v)) {
+          $v = $v ? 1 : 0;
+        }
+        if (!is_numeric($v)) continue;
         if (!isset($teamsAgg[$tnum]['metrics_sum'][$k])) $teamsAgg[$tnum]['metrics_sum'][$k] = 0;
         $teamsAgg[$tnum]['metrics_sum'][$k] += (float)$v;
         $metricsKeys[$k] = true;
