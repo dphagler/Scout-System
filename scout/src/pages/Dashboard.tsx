@@ -44,6 +44,7 @@ export default function Dashboard() {
   const [sortKey, setSortKey] = React.useState<string>('team_number')
   const [sortDir, setSortDir] = React.useState<'asc'|'desc'>('asc')
   const [teamOpen, setTeamOpen] = React.useState<number | null>(null)
+  const [showColumnChooser, setShowColumnChooser] = React.useState(false)
   const colsKey = React.useMemo(() => `dash:cols:${settings.eventKey || 'global'}`, [settings.eventKey])
 
   const base = toApiBase(settings.syncUrl)
@@ -238,16 +239,19 @@ export default function Dashboard() {
               <button className="btn" onClick={()=>applyPreset('Auto')}>Auto</button>
               <button className="btn" onClick={()=>applyPreset('Teleop')}>Teleop</button>
               <button className="btn" onClick={()=>applyPreset('Endgame')}>Endgame</button>
+              <button className="btn" onClick={()=>setShowColumnChooser(s => !s)}>Custom</button>
             </div>
           </div>
-          <div className="row" style={{ gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
-            {metrics.map(k => (
-              <label key={`m_${k}`} className="row" style={{ gap: 6 }}>
-                <input type="checkbox" checked={visibleMetrics.includes(k)} onChange={()=>toggleMetric(k)} />
-                <span>{metricLabels[k] || k}</span>
-              </label>
-            ))}
-          </div>
+          {showColumnChooser && (
+            <div className="row" style={{ gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
+              {metrics.map(k => (
+                <label key={`m_${k}`} className="row" style={{ gap: 6 }}>
+                  <input type="checkbox" checked={visibleMetrics.includes(k)} onChange={()=>toggleMetric(k)} />
+                  <span>{metricLabels[k] || k}</span>
+                </label>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Team table */}
@@ -280,17 +284,6 @@ export default function Dashboard() {
           </table>
         </div>
 
-        {/* Recent activity */}
-        <div style={{ marginTop: 16 }}>
-          <h4 style={{ margin: '8px 0' }}>Recent Submissions</h4>
-          <ul style={{ maxHeight: 200, overflowY: 'auto', paddingLeft: 16 }}>
-            {(data?.recent || []).map((r, i) => (
-              <li key={`${r.match_key}_${r.team_number}_${i}`}>
-                {r.match_key} · #{r.team_number} · {r.alliance || '-'}{r.position || ''}
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
       {teamOpen !== null && (
         <TeamModal teamNumber={teamOpen} onClose={()=>setTeamOpen(null)} />
