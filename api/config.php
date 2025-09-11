@@ -51,6 +51,17 @@ function client_api_key() {
   return $key;
 }
 
+function require_api_key() {
+  global $API_KEY;
+  $key = client_api_key();
+  if (!$key || !hash_equals($API_KEY, $key)) {
+    http_response_code(401);
+    echo json_encode(['ok' => false, 'error' => 'unauthorized'], JSON_UNESCAPED_SLASHES);
+    exit;
+  }
+  return $key;
+}
+
 function cors_preflight() {
   global $CORS_ALLOWED_ORIGINS;
   $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

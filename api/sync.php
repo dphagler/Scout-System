@@ -9,12 +9,7 @@ require_once __DIR__ . '/config.php';
 cors_preflight();
 
 // Verify API key
-$key = client_api_key();
-if (!$key || $key !== $API_KEY) {
-  http_response_code(401);
-  echo json_encode(['ok' => false, 'error' => 'unauthorized'], JSON_UNESCAPED_SLASHES);
-  exit;
-}
+require_api_key();
 
 // Decode JSON body
 $raw = file_get_contents('php://input');

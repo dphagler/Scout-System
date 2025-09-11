@@ -5,11 +5,7 @@ cors_preflight();
 header('Content-Type: application/json; charset=utf-8');
 
 try {
-  $key = client_api_key();
-  if (!$key || $key !== $API_KEY) {
-    http_response_code(401);
-    echo json_encode(['ok' => false, 'error' => 'unauthorized']); exit;
-  }
+  require_api_key();
 
   $event = isset($_GET['event']) ? trim($_GET['event']) : '';
   $team  = isset($_GET['team'])  ? intval($_GET['team']) : 0;
