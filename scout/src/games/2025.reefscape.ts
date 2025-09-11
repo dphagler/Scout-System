@@ -1,7 +1,7 @@
 import { GameConfig } from './types'
 
 // Reefscape (2025): per-level coral in Auto & Teleop + algae + mobility + coop + notes.
-// Endgame (climb) remains defined here so MatchForm won't duplicate it.
+// Endgame remains defined here so MatchForm won't duplicate it.
 export const GAME_2025: GameConfig = {
   id: 'reefscape-2025',
   name: 'Reefscape (2025)',
@@ -34,12 +34,12 @@ export const GAME_2025: GameConfig = {
       fields: [
         {
           kind: 'select',
-          key: 'endgame_climb',
+          key: 'endgame',
           label: 'Endgame',
           options: [
-            { value: 'none',   label: 'None' },
-            { value: 'low',    label: 'Shallow' },
-            { value: 'mid',    label: 'Deep' }
+            { value: 'none',    label: 'None' },
+            { value: 'shallow', label: 'Shallow' },
+            { value: 'deep',    label: 'Deep' }
           ]
         },
         { kind: 'toggle', key: 'coop', label: 'Coopertition Achieved' }
