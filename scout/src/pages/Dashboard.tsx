@@ -349,6 +349,10 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
     return posStr || '-'
   }
 
+  function fmt(v?: number | null) {
+    return v !== null && v !== undefined ? v.toFixed(2) : '-'
+  }
+
   const pit = detail?.pit || null
   const dims = parseJsonMaybe(pit?.dims_json)
   const mechs = parseJsonMaybe(pit?.mechanisms_json)
@@ -388,7 +392,7 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
                 ))}
               </ul>
               <p className="help">
-                Played: {detail?.played ?? 0} · Penalties Avg: {detail?.penalties_avg ?? '-'} · Driver Avg: {detail?.driver_skill_avg ?? '-'} · Broke Down Avg: {detail?.broke_down_avg ?? '-'} · Defended By Avg: {detail?.defended_by_avg ?? '-'} · Defense Played Avg: {detail?.defense_played_avg ?? '-'}
+                Played: {detail?.played ?? 0} · Penalties Avg: {fmt(detail?.penalties_avg)} · Driver Avg: {fmt(detail?.driver_skill_avg)} · Broke Down Avg: {fmt(detail?.broke_down_avg)} · Defended By Avg: {fmt(detail?.defended_by_avg)} · Defense Played Avg: {fmt(detail?.defense_played_avg)}
               </p>
               {detail?.cards && detail.cards.length > 0 && (
                 <p className="help">Cards: {detail.cards.join(', ')}</p>
