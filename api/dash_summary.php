@@ -25,15 +25,22 @@ try {
   $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   $teamsAgg = []; $metricsKeys = []; $flagKeys = []; $recent = [];
+  $selectKeys = [];
 
   foreach ($rows as $r) {
     $tnum = (int)$r['team_number']; if ($tnum <= 0) continue;
     if (!isset($teamsAgg[$tnum])) {
       $teamsAgg[$tnum] = [
         'team_number' => $tnum, 'played' => 0,
-        'metrics_sum' => [], 'flags_sum' => [],
-        'penalties_sum' => 0, 'endgame' => [], 'card' => [],
-        'driver_skill_sum' => 0, 'defense_played_sum' => 0, 'defended_by_sum' => 0,
+        'metrics_sum' => [],
+        'flags_sum' => [],
+        'selects' => [],
+        'penalties_sum' => 0,
+        'card' => [],
+        'driver_skill_sum' => 0,
+        'defense_played_sum' => 0,
+        'defended_by_sum' => 0,
+        'broke_down_sum' => 0,
       ];
     }
     $teamsAgg[$tnum]['played'] += 1;
@@ -41,14 +48,19 @@ try {
     $m = json_decode($r['metrics_json'] ?? "{}", true);
     if (is_array($m)) {
       foreach ($m as $k=>$v) {
-        // Allow boolean metrics (toggles) by treating true/false as 1/0
         if (is_bool($v)) {
           $v = $v ? 1 : 0;
         }
-        if (!is_numeric($v)) continue;
-        if (!isset($teamsAgg[$tnum]['metrics_sum'][$k])) $teamsAgg[$tnum]['metrics_sum'][$k] = 0;
-        $teamsAgg[$tnum]['metrics_sum'][$k] += (float)$v;
-        $metricsKeys[$k] = true;
+        if (is_numeric($v)) {
+          if (!isset($teamsAgg[$tnum]['metrics_sum'][$k])) $teamsAgg[$tnum]['metrics_sum'][$k] = 0;
+          $teamsAgg[$tnum]['metrics_sum'][$k] += (float)$v;
+          $metricsKeys[$k] = true;
+        } elseif (is_string($v) && $v !== '') {
+          if (!isset($teamsAgg[$tnum]['selects'][$k])) $teamsAgg[$tnum]['selects'][$k] = [];
+          if (!isset($teamsAgg[$tnum]['selects'][$k][$v])) $teamsAgg[$tnum]['selects'][$k][$v] = 0;
+          $teamsAgg[$tnum]['selects'][$k][$v] += 1;
+          $selectKeys[$k] = true;
+        }
       }
     }
     // flags_json is legacy; tolerate missing
@@ -61,20 +73,16 @@ try {
       }
     }
     $teamsAgg[$tnum]['penalties_sum'] += (int)($r['penalties'] ?? 0);
+    $teamsAgg[$tnum]['broke_down_sum'] += (int)($r['broke_down'] ?? 0);
 
-    // Derive endgame label from metrics_json if column is missing
-    $eg = null;
-    if (array_key_exists('endgame', $r)) {
-      $eg = $r['endgame'];
-    }
-    if ($eg === null && is_array($m)) {
-      if (isset($m['endgame'])) { $eg = is_string($m['endgame']) ? $m['endgame'] : (string)$m['endgame']; }
-      elseif (isset($m['end'])) { $eg = is_string($m['end']) ? $m['end'] : (string)$m['end']; }
-      elseif (isset($m['climb'])) { $eg = is_string($m['climb']) ? $m['climb'] : (string)$m['climb']; }
-    }
+    // Legacy endgame column support
+    $eg = $r['endgame'] ?? null;
     if ($eg !== null && $eg !== '') {
-      if (!isset($teamsAgg[$tnum]['endgame'][$eg])) $teamsAgg[$tnum]['endgame'][$eg] = 0;
-      $teamsAgg[$tnum]['endgame'][$eg] += 1;
+      $eg = is_string($eg) ? $eg : (string)$eg;
+      if (!isset($teamsAgg[$tnum]['selects']['endgame'])) $teamsAgg[$tnum]['selects']['endgame'] = [];
+      if (!isset($teamsAgg[$tnum]['selects']['endgame'][$eg])) $teamsAgg[$tnum]['selects']['endgame'][$eg] = 0;
+      $teamsAgg[$tnum]['selects']['endgame'][$eg] += 1;
+      $selectKeys['endgame'] = true;
     }
 
     $card = $r['card'] ?? 'none';
@@ -87,7 +95,7 @@ try {
 
     $recent[] = [
       'match_key' => $r['match_key'], 'team_number' => $tnum, 'alliance' => $r['alliance'],
-      'position' => (int)$r['position'], 'metrics' => $m, 'endgame' => ($eg ?? null), 'card' => $card,
+      'position' => (int)$r['position'], 'metrics' => $m, 'card' => $card,
       'penalties' => (int)($r['penalties'] ?? 0), 'scout_name' => $r['scout_name'] ?? null,
       'created_at_ms' => (int)($r['created_at_ms'] ?? 0),
     ];
@@ -108,7 +116,14 @@ try {
     $played = max(1, (int)$agg['played']);
     $avg = []; foreach ($agg['metrics_sum'] as $k=>$sum) { $avg[$k] = round($sum / $played, 2); }
     $flags_pct = []; foreach ($agg['flags_sum'] as $k=>$cnt) { $flags_pct[$k] = round(100.0*$cnt/$played,1); }
-    $end_pct = []; foreach ($agg['endgame'] as $k=>$cnt) { $end_pct[$k] = round(100.0*$cnt/$played,1); }
+    $select_pct = [];
+    foreach ($agg['selects'] as $k=>$opts) {
+      $select_pct[$k] = [];
+      foreach ($opts as $val=>$cnt) {
+        $select_pct[$k][$val] = round(100.0*$cnt/$played,1);
+      }
+    }
+    $end_pct = $select_pct['endgame'] ?? $select_pct['endgame_climb'] ?? [];
     $card_pct = []; foreach ($agg['card'] as $k=>$cnt) { $card_pct[$k] = round(100.0*$cnt/$played,1); }
 
     $teams[] = [
@@ -117,11 +132,15 @@ try {
       'name' => $nick[$tnum]['name'] ?? null,
       'played' => $agg['played'],
       'avg' => $avg, 'sum' => $agg['metrics_sum'],
-      'flags_pct' => $flags_pct, 'endgame_pct' => $end_pct, 'card_pct' => $card_pct,
+      'flags_pct' => $flags_pct,
+      'select_pct' => $select_pct,
+      'endgame_pct' => $end_pct,
+      'card_pct' => $card_pct,
       'penalties_avg' => round($agg['penalties_sum'] / $played, 2),
       'driver_skill_avg' => round($agg['driver_skill_sum'] / $played, 2),
       'defense_played_avg' => round($agg['defense_played_sum'] / $played, 2),
       'defended_by_avg' => round($agg['defended_by_sum'] / $played, 2),
+      'broke_down_pct' => round(100.0 * $agg['broke_down_sum'] / $played, 1),
     ];
   }
 
@@ -138,7 +157,9 @@ try {
   echo json_encode([
     'ok' => true, 'event' => $event,
     'stats' => [ 'teams' => count($teams), 'matches' => count($rows),
-                 'metrics_keys' => array_keys($metricsKeys), 'flags_keys' => array_keys($flagKeys) ],
+                 'metrics_keys' => array_keys($metricsKeys),
+                 'flags_keys' => array_keys($flagKeys),
+                 'select_keys' => array_keys($selectKeys) ],
     'teams' => $teams, 'recent' => $recent
   ]);
 } catch (Throwable $e) {

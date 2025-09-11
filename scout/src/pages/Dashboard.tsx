@@ -1,5 +1,6 @@
 import React from 'react'
 import { SettingsContext, toApiBase } from '../settings'
+import { getGameForEvent } from '../gameConfig'
 
 type DashTeam = {
   team_number: number
@@ -9,18 +10,20 @@ type DashTeam = {
   avg: Record<string, number>
   sum: Record<string, number>
   flags_pct: Record<string, number>
+  select_pct?: Record<string, Record<string, number>>
   endgame_pct: Record<string, number>
   card_pct: Record<string, number>
   penalties_avg?: number
   driver_skill_avg?: number
   defense_played_avg?: number
   defended_by_avg?: number
+  broke_down_pct?: number
 }
 
 type DashSummary = {
   ok: boolean
   event: string
-  stats: { teams: number; matches: number; metrics_keys: string[]; flags_keys: string[] }
+  stats: { teams: number; matches: number; metrics_keys: string[]; flags_keys: string[]; select_keys?: string[] }
   teams: DashTeam[]
   recent: Array<{
     match_key: string
@@ -71,9 +74,53 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.eventKey, settings.apiKey, settings.syncUrl])
 
-  const metrics = data?.stats?.metrics_keys || []
+  const game = React.useMemo(() => getGameForEvent(settings.eventKey || ''), [settings.eventKey])
+
+  type MetricDef = { key: string, label: string, percent: boolean, selectField?: string, selectOption?: string }
+
+  const metricDefs: MetricDef[] = React.useMemo(() => {
+    const defs: MetricDef[] = []
+    // From game config
+    game.sections.forEach(sec => {
+      sec.fields.forEach(f => {
+        if (f.kind === 'counter') defs.push({ key: f.key, label: f.label, percent: false })
+        else if (f.kind === 'toggle') defs.push({ key: f.key, label: f.label, percent: true })
+        else if (f.kind === 'select') {
+          f.options.forEach(opt => {
+            defs.push({ key: `${f.key}:${opt.value}`, label: `${f.label}: ${opt.label}`, percent: true, selectField: f.key, selectOption: opt.value })
+          })
+        }
+      })
+    })
+    // Include any metrics reported by server but not in config
+    ;(data?.stats?.metrics_keys || []).forEach(k => {
+      if (!defs.find(d => d.key === k)) defs.push({ key: k, label: k, percent: false })
+    })
+    // Special built-in metrics
+    defs.push(
+      { key: 'penalties', label: 'Penalties', percent: false },
+      { key: 'broke_down', label: 'Broke Down', percent: true },
+      { key: 'defense_played', label: 'Defense Played', percent: false },
+      { key: 'defended_by', label: 'Defended By', percent: false },
+      { key: 'driver_skill', label: 'Driver Skill', percent: false },
+    )
+    return defs
+  }, [game, data?.stats?.metrics_keys])
+
+  const metrics = React.useMemo(() => metricDefs.map(d => d.key), [metricDefs])
+  const metricLabels = React.useMemo(() => {
+    const m: Record<string, string> = {}
+    metricDefs.forEach(d => { m[d.key] = d.label })
+    return m
+  }, [metricDefs])
+  const percentMetrics = React.useMemo(() => new Set(metricDefs.filter(d => d.percent).map(d => d.key)), [metricDefs])
+  const selectMetricMap = React.useMemo(() => {
+    const m: Record<string, { field: string, option: string }> = {}
+    metricDefs.forEach(d => { if (d.selectField) m[d.key] = { field: d.selectField, option: d.selectOption! } })
+    return m
+  }, [metricDefs])
+
   React.useEffect(() => {
-    // Initialize visible metrics exactly once when data arrives
     if (metrics.length && !metricsInitialized) {
       // Try to restore from localStorage (intersect with current metrics)
       let restored: string[] = []
@@ -123,10 +170,22 @@ export default function Dashboard() {
         setSortDir(d => (d === 'asc' ? 'desc' : 'asc'))
         return prev
       }
-      setSortDir(nextKey.startsWith('avg:') || nextKey === 'played' || nextKey === 'driver_skill_avg' ? 'desc' : 'asc')
+      setSortDir(nextKey.startsWith('metric:') || nextKey === 'played' ? 'desc' : 'asc')
       return nextKey
     })
   }
+
+  const getMetricValue = React.useCallback((t: DashTeam, k: string) => {
+    if (k === 'penalties') return t.penalties_avg ?? 0
+    if (k === 'driver_skill') return t.driver_skill_avg ?? 0
+    if (k === 'defense_played') return t.defense_played_avg ?? 0
+    if (k === 'defended_by') return t.defended_by_avg ?? 0
+    if (k === 'broke_down') return t.broke_down_pct ?? 0
+    const sel = selectMetricMap[k]
+    if (sel) return t.select_pct?.[sel.field]?.[sel.option] ?? 0
+    const base = t.avg?.[k] ?? 0
+    return percentMetrics.has(k) ? base * 100 : base
+  }, [percentMetrics, selectMetricMap])
 
   const sortedTeams = React.useMemo(() => {
     const items = (data?.teams || []).slice()
@@ -143,16 +202,14 @@ export default function Dashboard() {
       if (key === 'team_number') return cmpNum(num(a.team_number), num(b.team_number))
       if (key === 'nickname') return cmpStr(a.nickname||'', b.nickname||'')
       if (key === 'played') return cmpNum(num(a.played), num(b.played))
-      if (key === 'driver_skill_avg') return cmpNum(num(a.driver_skill_avg), num(b.driver_skill_avg))
-      if (key === 'penalties_avg') return cmpNum(num(a.penalties_avg), num(b.penalties_avg))
-      if (key.startsWith('avg:')) {
-        const k = key.slice(4)
-        return cmpNum(num(a.avg?.[k]), num(b.avg?.[k]))
+      if (key.startsWith('metric:')) {
+        const k = key.slice(7)
+        return cmpNum(num(getMetricValue(a, k)), num(getMetricValue(b, k)))
       }
       return 0
     })
     return items
-  }, [data?.teams, sortKey, sortDir])
+  }, [data?.teams, sortKey, sortDir, getMetricValue])
   const exportHref = `${base}/dash_export_csv.php?event=${encodeURIComponent(settings.eventKey)}&key=${encodeURIComponent(settings.apiKey)}`
 
   return (
@@ -187,7 +244,7 @@ export default function Dashboard() {
             {metrics.map(k => (
               <label key={`m_${k}`} className="row" style={{ gap: 6 }}>
                 <input type="checkbox" checked={visibleMetrics.includes(k)} onChange={()=>toggleMetric(k)} />
-                <span>{k}</span>
+                <span>{metricLabels[k] || k}</span>
               </label>
             ))}
           </div>
@@ -202,10 +259,8 @@ export default function Dashboard() {
                 <th className="clickable" onClick={()=>onSort('nickname')}>Nick {sortKey==='nickname' ? (sortDir==='asc'?'▲':'▼') : ''}</th>
                 <th className="clickable" onClick={()=>onSort('played')}>Played {sortKey==='played' ? (sortDir==='asc'?'▲':'▼') : ''}</th>
                 {visibleMetrics.map(k => (
-                  <th key={`h_${k}`} className="clickable" onClick={()=>onSort('avg:'+k)}>avg {k} {sortKey===`avg:${k}` ? (sortDir==='asc'?'▲':'▼') : ''}</th>
+                  <th key={`h_${k}`} className="clickable" onClick={()=>onSort(`metric:${k}`)}>{metricLabels[k] || k} {sortKey===`metric:${k}` ? (sortDir==='asc'?'▲':'▼') : ''}</th>
                 ))}
-                <th className="clickable" onClick={()=>onSort('driver_skill_avg')}>Drv {sortKey==='driver_skill_avg' ? (sortDir==='asc'?'▲':'▼') : ''}</th>
-                <th className="clickable" onClick={()=>onSort('penalties_avg')}>Pen {sortKey==='penalties_avg' ? (sortDir==='asc'?'▲':'▼') : ''}</th>
               </tr>
             </thead>
             <tbody>
@@ -214,11 +269,11 @@ export default function Dashboard() {
                   <td><button className="btn" onClick={()=>setTeamOpen(t.team_number)} style={{ padding: '4px 8px' }}>{t.team_number}</button></td>
                   <td><span className="clickable" onClick={()=>setTeamOpen(t.team_number)}>{t.nickname || ''}</span></td>
                   <td>{t.played}</td>
-                  {visibleMetrics.map(k => (
-                    <td key={`${t.team_number}_${k}`}>{t.avg?.[k] ?? 0}</td>
-                  ))}
-                  <td>{t.driver_skill_avg ?? 0}</td>
-                  <td>{t.penalties_avg ?? 0}</td>
+                  {visibleMetrics.map(k => {
+                    const val = getMetricValue(t, k)
+                    const display = percentMetrics.has(k) ? val.toFixed(1) : val
+                    return <td key={`${t.team_number}_${k}`}>{display}</td>
+                  })}
                 </tr>
               ))}
             </tbody>
