@@ -373,7 +373,12 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
                   </li>
                 ))}
               </ul>
-              <p className="help">Played: {detail?.played ?? 0} · Penalties Avg: {detail?.penalties_avg ?? '-'} · Driver Avg: {detail?.driver_skill_avg ?? '-'}</p>
+              <p className="help">
+                Played: {detail?.played ?? 0} · Penalties Avg: {detail?.penalties_avg ?? '-'} · Driver Avg: {detail?.driver_skill_avg ?? '-'} · Broke Down Avg: {detail?.broke_down_avg ?? '-'} · Defended By Avg: {detail?.defended_by_avg ?? '-'} · Defense Played Avg: {detail?.defense_played_avg ?? '-'}
+              </p>
+              {detail?.cards && detail.cards.length > 0 && (
+                <p className="help">Cards: {detail.cards.join(', ')}</p>
+              )}
               <p className="help"><a href={`https://www.statbotics.io/team/${teamNumber}`} target="_blank" rel="noopener noreferrer">View on Statbotics</a></p>
             </div>
           </div>
