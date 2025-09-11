@@ -1,14 +1,14 @@
 <?php
-// --- Base config (safe defaults). You can override in config.local.php ---
+// --- Base config (safe defaults). Override via environment variables or config.local.php ---
 
-$API_KEY = '123456789abcdefg11';   // server API key used by your PWA/dashboard
-$TBA_KEY = 'P1OCFTEclkeAJO4vxlwirA4OqmrDyE7wqBLqTZTXftp2iXzg10KLFgQJ8aS7sFsQ';  // <-- paste your real TBA v3 key
+$API_KEY = getenv('API_KEY') ?: '';
+$TBA_KEY = getenv('TBA_KEY') ?: '';
 
-// DB creds — fill these in
-$DB_HOST = '127.0.0.1';
-$DB_NAME = 'hctdron1_frc_scouting';
-$DB_USER = 'hctdron1_frcscouting';
-$DB_PASS = 't80MmVFkaHQ&#p#2';
+// DB creds — override these in your environment or config.local.php
+$DB_HOST = getenv('DB_HOST') ?: '127.0.0.1';
+$DB_NAME = getenv('DB_NAME') ?: '';
+$DB_USER = getenv('DB_USER') ?: '';
+$DB_PASS = getenv('DB_PASS') ?: '';
 
 // Allowed origins for CORS
 $CORS_ALLOWED_ORIGINS = [
