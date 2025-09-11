@@ -2,3 +2,7 @@
 dist/
 node_modules/
 uploads/
+
+# Local environment configuration
+.env
+api/config.local.php
