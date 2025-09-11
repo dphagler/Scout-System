@@ -27,12 +27,12 @@ export const GAME_2024: GameConfig = {
       fields: [
         {
           kind: 'select',
-          key: 'endgame_status',
+          key: 'endgame',
           label: 'Endgame',
           options: [
-            { value: 'none',  label: 'None' },
-            { value: 'park',  label: 'Park' },
-            { value: 'onstage', label: 'Onstage' },
+            { value: 'none',      label: 'None' },
+            { value: 'park',      label: 'Park' },
+            { value: 'onstage',   label: 'Onstage' },
             { value: 'harmonize', label: 'Harmonize' }
           ]
         },
