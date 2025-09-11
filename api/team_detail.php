@@ -70,15 +70,15 @@ try {
       COUNT(*)                           AS played,
       AVG(NULLIF(penalties, NULL))       AS penalties_avg,
       AVG(NULLIF(driver_skill, NULL))    AS driver_skill_avg,
-      AVG(broke_down)                    AS broke_down_avg,
-      AVG(defended_by)                   AS defended_by_avg,
-      AVG(defense_played)                AS defense_played_avg
+      COALESCE(AVG(broke_down), 0)       AS broke_down_avg,
+      COALESCE(AVG(defended_by), 0)      AS defended_by_avg,
+      COALESCE(AVG(defense_played), 0)   AS defense_played_avg
     FROM match_records
     WHERE team_number = ?
       AND match_key LIKE CONCAT(?, '_%')
   ");
   $stmt->execute([$team, $event]);
-  $agg = $stmt->fetch() ?: ['played'=>0,'penalties_avg'=>null,'driver_skill_avg'=>null,'broke_down_avg'=>null,'defended_by_avg'=>null,'defense_played_avg'=>null];
+  $agg = $stmt->fetch() ?: ['played'=>0,'penalties_avg'=>null,'driver_skill_avg'=>null,'broke_down_avg'=>0,'defended_by_avg'=>0,'defense_played_avg'=>0];
 
   // --- Cards received (distinct)
   $stmt = $pdo->prepare("
@@ -156,9 +156,9 @@ try {
     'played' => intval($agg['played'] ?? 0),
     'penalties_avg' => $agg['penalties_avg'] !== null ? round(floatval($agg['penalties_avg']), 2) : null,
     'driver_skill_avg' => $agg['driver_skill_avg'] !== null ? round(floatval($agg['driver_skill_avg']), 2) : null,
-    'broke_down_avg' => $agg['broke_down_avg'] !== null ? round(floatval($agg['broke_down_avg']), 2) : null,
-    'defended_by_avg' => $agg['defended_by_avg'] !== null ? round(floatval($agg['defended_by_avg']), 2) : null,
-    'defense_played_avg' => $agg['defense_played_avg'] !== null ? round(floatval($agg['defense_played_avg']), 2) : null,
+    'broke_down_avg' => round(floatval($agg['broke_down_avg'] ?? 0), 2),
+    'defended_by_avg' => round(floatval($agg['defended_by_avg'] ?? 0), 2),
+    'defense_played_avg' => round(floatval($agg['defense_played_avg'] ?? 0), 2),
     'cards' => $cards,
     'flags_pct' => (object)$flagsPct,
     'endgame_pct' => (object)$endgamePct
