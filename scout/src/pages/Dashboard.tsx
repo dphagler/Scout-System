@@ -112,7 +112,7 @@ export default function Dashboard() {
     const has = (k: string, re: RegExp) => re.test(k.toLowerCase())
     if (name === 'Auto') sel = m.filter(k => has(k, /auto/))
     else if (name === 'Teleop') sel = m.filter(k => has(k, /tele|teleop|tp|driver/))
-    else if (name === 'Endgame') sel = m.filter(k => has(k, /end|endgame|climb|hang|park/))
+    else if (name === 'Endgame') sel = m.filter(k => has(k, /end|endgame|climb|hang|park|coop/))
     else sel = m.filter(k => has(k, /score|pts|point|coral|algae|amp|speaker|ring|note|cube|cone|goal|high|mid|low/))
     setVisibleMetrics(sel)
   }
@@ -251,7 +251,6 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
   const [error, setError] = React.useState<string | null>(null)
   const [detail, setDetail] = React.useState<any>(null)
   const [photoOpen, setPhotoOpen] = React.useState<string | null>(null)
-  const [sb, setSb] = React.useState<{ epa?: number; epa_rank?: number; epa_percentile?: number; opr?: number; dpr?: number; ccwm?: number } | null>(null)
 
   React.useEffect(() => {
     let alive = true
@@ -264,22 +263,6 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
         if (!alive) return
         if (!j?.ok) throw new Error('Server error')
         setDetail(j)
-        // Fetch Statbotics team-year EPA if possible (derive year from event key prefix)
-        const evt = settings.eventKey || ''
-        const yearStr = evt.slice(0, 4)
-        const yTmp = parseInt(yearStr, 10)
-        const year = Number.isFinite(yTmp) && yearStr.length === 4 ? yTmp : undefined
-        if (year) {
-          try {
-            const sbUrl = `${base}/statbotics_proxy.php?kind=team_year&team=${encodeURIComponent(String(teamNumber))}&year=${year}&key=${encodeURIComponent(settings.apiKey)}`
-            const rr = await fetch(sbUrl, { headers: { 'X-API-KEY': settings.apiKey } })
-            if (rr.ok) {
-              const sj = await rr.json()
-              const d = sj?.data || null
-              if (d) setSb({ epa: d.epa, epa_rank: d.epa_rank, epa_percentile: d.epa_percentile, opr: d.opr, dpr: d.dpr, ccwm: d.ccwm })
-            }
-          } catch {}
-        }
       } catch (e: any) {
         if (alive) setError(e?.message || String(e))
       } finally {
@@ -330,14 +313,13 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
               <ul>
                 {(detail?.recent || []).map((m:any, i:number) => (
                   <li key={i} className="help">
-                    {m.match_key} · {m.alliance || '-'}{m.position || ''} · End: {m.endgame || '-'} · Pen: {m.penalties ?? '-'} · Drv: {m.driver_skill ?? '-'}
+                    <a href={`https://www.statbotics.io/match/${m.match_key}`} target="_blank" rel="noopener noreferrer">{m.match_key}</a>
+                    {` · ${m.alliance || '-'}${m.position || ''}`}
                   </li>
                 ))}
               </ul>
               <p className="help">Played: {detail?.played ?? 0} · Penalties Avg: {detail?.penalties_avg ?? '-'} · Driver Avg: {detail?.driver_skill_avg ?? '-'}</p>
-              {sb && (
-                <p className="help">Statbotics: EPA {sb.epa?.toFixed?.(1) ?? '-'} · Rank {sb.epa_rank ?? '-'} · Percentile {sb.epa_percentile !== undefined ? Math.round((sb.epa_percentile as number)*100) : '-'}%</p>
-              )}
+              <p className="help"><a href={`https://www.statbotics.io/team/${teamNumber}`} target="_blank" rel="noopener noreferrer">View on Statbotics</a></p>
             </div>
           </div>
         )}
