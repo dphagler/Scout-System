@@ -1,6 +1,8 @@
 # Build artifacts
 dist/
+scout/dist/
 node_modules/
+scout/node_modules
 uploads/
 
 # Local environment configuration
