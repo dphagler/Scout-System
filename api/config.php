@@ -1,19 +1,4 @@
 <?php
-// --- Load environment variables from optional .env file ---
-foreach ([__DIR__ . '/../.env', __DIR__ . '/.env'] as $dotenv) {
-  if (is_file($dotenv)) {
-    $lines = file($dotenv, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-      $line = trim($line);
-      if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) continue;
-      [$name, $value] = array_map('trim', explode('=', $line, 2));
-      putenv("$name=$value");
-      $_ENV[$name] = $value;
-    }
-  }
-}
-
-// --- Base config (safe defaults). Override via environment or config.local.php ---
 
 $API_KEY = getenv('API_KEY') ?: '';
 $TBA_KEY = getenv('TBA_KEY') ?: '';
