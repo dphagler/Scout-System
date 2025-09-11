@@ -79,6 +79,32 @@ try {
     echo json_encode(['ok'=>false,'error'=>'empty_body']); exit;
   }
 
+  // ---- Validate file ----
+  $maxBytes     = 5 * 1024 * 1024; // 5 MB limit
+  $allowedExts  = ['png','jpg','jpeg','webp','gif','avif'];
+  $allowedMimes = ['image/png','image/jpeg','image/webp','image/gif','image/avif'];
+
+  // size check
+  if (strlen($content) > $maxBytes) {
+    http_response_code(400);
+    echo json_encode(['ok'=>false,'error'=>'file_too_large']); exit;
+  }
+
+  // extension check
+  $ext = strtolower(pathinfo($safe, PATHINFO_EXTENSION));
+  if (!in_array($ext, $allowedExts, true)) {
+    http_response_code(400);
+    echo json_encode(['ok'=>false,'error'=>'invalid_extension']); exit;
+  }
+
+  // MIME check
+  $finfo = new finfo(FILEINFO_MIME_TYPE);
+  $mime  = $finfo->buffer($content);
+  if ($mime === false || !in_array($mime, $allowedMimes, true)) {
+    http_response_code(400);
+    echo json_encode(['ok'=>false,'error'=>'invalid_type']); exit;
+  }
+
   // ---- Write file ----
   if (file_put_contents($targetPath, $content) === false) {
     throw new Exception('write_failed');
