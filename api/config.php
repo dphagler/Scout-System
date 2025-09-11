@@ -1,14 +1,28 @@
 <?php
-// --- Base config (safe defaults). You can override in config.local.php ---
+// --- Load environment variables from optional .env file ---
+foreach ([__DIR__ . '/../.env', __DIR__ . '/.env'] as $dotenv) {
+  if (is_file($dotenv)) {
+    $lines = file($dotenv, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+      $line = trim($line);
+      if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) continue;
+      [$name, $value] = array_map('trim', explode('=', $line, 2));
+      putenv("$name=$value");
+      $_ENV[$name] = $value;
+    }
+  }
+}
 
-$API_KEY = '123456789abcdefg11';   // server API key used by your PWA/dashboard
-$TBA_KEY = 'P1OCFTEclkeAJO4vxlwirA4OqmrDyE7wqBLqTZTXftp2iXzg10KLFgQJ8aS7sFsQ';  // <-- paste your real TBA v3 key
+// --- Base config (safe defaults). Override via environment or config.local.php ---
 
-// DB creds — fill these in
-$DB_HOST = '127.0.0.1';
-$DB_NAME = 'hctdron1_frc_scouting';
-$DB_USER = 'hctdron1_frcscouting';
-$DB_PASS = 't80MmVFkaHQ&#p#2';
+$API_KEY = getenv('API_KEY') ?: '';
+$TBA_KEY = getenv('TBA_KEY') ?: '';
+
+// DB creds — override these in your environment or config.local.php
+$DB_HOST = getenv('DB_HOST') ?: '127.0.0.1';
+$DB_NAME = getenv('DB_NAME') ?: '';
+$DB_USER = getenv('DB_USER') ?: '';
+$DB_PASS = getenv('DB_PASS') ?: '';
 
 // Allowed origins for CORS
 $CORS_ALLOWED_ORIGINS = [
