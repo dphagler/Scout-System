@@ -349,8 +349,10 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
     return posStr || '-'
   }
 
-  function fmt(v?: number | null) {
-    return v !== null && v !== undefined ? v.toFixed(2) : '-'
+  function fmt(v?: number | string | null) {
+    if (v === null || v === undefined) return '-'
+    const num = typeof v === 'string' ? Number(v) : v
+    return Number.isFinite(num) ? num.toFixed(2) : '-'
   }
 
   const pit = detail?.pit || null
