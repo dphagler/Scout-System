@@ -382,10 +382,17 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
                 {(detail?.recent || []).map((m:any, i:number) => (
                   <li key={i} className="help">
                     <a href={`https://www.statbotics.io/match/${m.match_key}`} target="_blank" rel="noopener noreferrer">{m.match_key}</a>
-                    {` · ${formatStation(m.alliance, m.position)}`}
+                    {` · ${formatStation(m.alliance, m.position)} · Endgame: ${m.endgame || '-'}`}
                   </li>
                 ))}
               </ul>
+              {detail?.endgame_pct && (
+                <ul>
+                  {Object.entries(detail.endgame_pct as Record<string, number>).map(([k, v]: [string, number]) => (
+                    <li key={k} className="help">{`${k}: ${(v * 100).toFixed(0)}%`}</li>
+                  ))}
+                </ul>
+              )}
               <p className="help">
                 Played: {detail?.played ?? 0} · Penalties Avg: {fmt(detail?.penalties_avg)} · Driver Avg: {fmt(detail?.driver_skill_avg)} · Broke Down Avg: {fmt(detail?.broke_down_avg)} · Defended By Avg: {fmt(detail?.defended_by_avg)} · Defense Played Avg: {fmt(detail?.defense_played_avg)}
               </p>
