@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-require __DIR__ . '/config.php';
+require_once __DIR__ . '/config.php';
 cors_preflight();
 
 try {
