@@ -116,6 +116,22 @@ try {
     $played = max(1, (int)$agg['played']);
     $avg = []; foreach ($agg['metrics_sum'] as $k=>$sum) { $avg[$k] = round($sum / $played, 2); }
     $flags_pct = []; foreach ($agg['flags_sum'] as $k=>$cnt) { $flags_pct[$k] = round(100.0*$cnt/$played,1); }
+
+    if (isset($agg['selects']['endgame_climb']) || isset($agg['selects']['endgame_status'])) {
+      if (!isset($agg['selects']['endgame'])) $agg['selects']['endgame'] = [];
+      foreach (['endgame_climb', 'endgame_status'] as $legacy) {
+        if (isset($agg['selects'][$legacy])) {
+          foreach ($agg['selects'][$legacy] as $val=>$cnt) {
+            if (!isset($agg['selects']['endgame'][$val])) $agg['selects']['endgame'][$val] = 0;
+            $agg['selects']['endgame'][$val] += $cnt;
+          }
+          unset($agg['selects'][$legacy]);
+        }
+      }
+      $selectKeys['endgame'] = true;
+      unset($selectKeys['endgame_climb'], $selectKeys['endgame_status']);
+    }
+
     $select_pct = [];
     foreach ($agg['selects'] as $k=>$opts) {
       $select_pct[$k] = [];
@@ -123,12 +139,7 @@ try {
         $select_pct[$k][$val] = round(100.0*$cnt/$played,1);
       }
     }
-    $select_pct['endgame'] = $select_pct['endgame']
-      ?? $select_pct['endgame_climb']
-      ?? $select_pct['endgame_status']
-      ?? [];
-    unset($select_pct['endgame_climb'], $select_pct['endgame_status']);
-    $end_pct = $select_pct['endgame'];
+    $end_pct = $select_pct['endgame'] ?? [];
     $card_pct = []; foreach ($agg['card'] as $k=>$cnt) { $card_pct[$k] = round(100.0*$cnt/$played,1); }
 
     $teams[] = [
