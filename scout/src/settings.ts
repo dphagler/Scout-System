@@ -29,10 +29,17 @@ function isBlank(v: any) {
 // Normalize to .../api (accepts root, /api, or /api/sync.php)
 export function toApiBase(url: string): string {
   const clean = (url || '').trim().replace(/\/+$/,'')
-  if (!clean) return '/api'
-  if (/\/sync\.php$/i.test(clean)) return clean.replace(/\/sync\.php$/i, '')
-  if (/\/api$/i.test(clean)) return clean
-  return clean + '/api'
+  const parsed = new URL(clean || '/', window.location.origin)
+  if (window.location.protocol === 'https:' && parsed.protocol === 'http:') {
+    parsed.protocol = 'https:'
+  }
+  let path = parsed.pathname.replace(/\/+$/,'')
+  if (/\/sync\.php$/i.test(path)) path = path.replace(/\/sync\.php$/i, '')
+  if (!/\/api$/i.test(path)) path = path + '/api'
+  parsed.pathname = path
+  parsed.search = ''
+  parsed.hash = ''
+  return parsed.toString()
 }
 
 function ensureDeviceId(existing?: string): string {
