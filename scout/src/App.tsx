@@ -22,6 +22,7 @@ export default function App() {
     syncUrl: '',
     apiKey: import.meta.env.VITE_API_KEY || ''
   })
+  const [settingsLoaded, setSettingsLoaded] = React.useState(false)
 
   // Load saved settings once — and force-merge env defaults into blanks
   React.useEffect(() => {
@@ -57,11 +58,13 @@ export default function App() {
       } catch {
         setSettings(normalizeSettings(fillBlanks({})))
       }
+      setSettingsLoaded(true)
     })()
   }, [])
 
   // Persist settings on change (normalize again to be safe)
   React.useEffect(() => {
+    if (!settingsLoaded) return
     try {
       const filled = {
         ...settings,
@@ -75,7 +78,7 @@ export default function App() {
       localStorage.setItem('scout:matchNumber', String(norm.matchNumber))
       if (JSON.stringify(norm) !== JSON.stringify(settings)) setSettings(norm)
     } catch {}
-  }, [settings, envDefaults])
+  }, [settings, envDefaults, settingsLoaded])
 
   // Hidden admin via ?admin=1
   React.useEffect(() => {
