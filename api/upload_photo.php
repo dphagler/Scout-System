@@ -4,7 +4,7 @@
 // Headers: X-API-KEY (or ?key=...), X-FILENAME (optional filename hint)
 // Query: ?event=2025gaalb&team=1795&name=... (name optional; we'll sanitize)
 
-require __DIR__ . '/config.php'; // db(), cors_preflight(), client_api_key(), $API_KEY
+require_once __DIR__ . '/config.php'; // db(), cors_preflight(), client_api_key(), $API_KEY
 
 // --- CORS ---
 cors_preflight();
