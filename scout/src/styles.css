@@ -58,7 +58,7 @@ h1, h2, h3, h4, h5, h6,
   max-width: 1000px;
   margin: 0 auto;
 }
-.nav .logo {
+.logo {
   height: 32px;
   width: auto;
 }
@@ -93,6 +93,12 @@ h1, h2, h3, h4, h5, h6,
 }
 @media (max-width: 640px) {
   .statusline .event { display: none; }
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
 }
 
 /* Modal (Dashboard team view) */

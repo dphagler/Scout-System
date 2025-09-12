@@ -15,6 +15,7 @@ export default function App() {
   const [settings, setSettings] = React.useState<any>(defaultSettings)
   const [syncBusy, setSyncBusy] = React.useState(false)
   const [syncHint, setSyncHint] = React.useState<string>('')
+  const showSyncModal = syncBusy || !!syncHint
   const [envDefaults, setEnvDefaults] = React.useState({
     eventKey: import.meta.env.VITE_EVENT_KEY || '',
     syncUrl: '',
@@ -193,7 +194,6 @@ export default function App() {
   return (
     <SettingsContext.Provider value={{ settings, setSettings }}>
       <div className="nav">
-        <img src={logoImg} alt="Commodore Robotics" className="logo" />
         <button className={`tab ${tab === 'match' ? 'active' : ''}`} onClick={() => setTab('match')}>Match</button>
         <button className={`tab ${tab === 'pit' ? 'active' : ''}`} onClick={() => setTab('pit')}>Pit</button>
         <button className={`tab ${tab === 'dash' ? 'active' : ''}`} onClick={() => setTab('dash')}>Dashboard</button>
@@ -203,10 +203,9 @@ export default function App() {
         <div className="statusline" style={{ marginRight: 8 }}>
           <span className="scout">Scout: {settings.scoutName || '-'}</span>
           <span className="event"> | Event: {settings.eventKey || '-'}</span>
-          {syncHint ? <span role="status" aria-live="polite"> | {syncHint}</span> : null}
         </div>
         <button className="btn" onClick={doUnifiedSync} disabled={syncBusy}>
-          {syncBusy ? (syncHint || 'Syncing...') : 'Sync'}
+          {syncBusy ? 'Syncing...' : 'Sync'}
         </button>
       </div>
 
@@ -269,6 +268,21 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {showSyncModal && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            <div className="header">
+              <h3>Sync Status</h3>
+            </div>
+            <p>{syncHint || 'Syncing...'}</p>
+          </div>
+        </div>
+      )}
+
+      <footer className="footer">
+        <img src={logoImg} alt="Commodore Robotics" className="logo" />
+      </footer>
     </SettingsContext.Provider>
   )
 }
