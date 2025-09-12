@@ -405,7 +405,10 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
         )}
       </div>
       {photoOpen && (
-        <div className="lightbox-backdrop" onClick={()=>setPhotoOpen(null)}>
+        <div
+          className="lightbox-backdrop"
+          onClick={(e)=>{ e.stopPropagation(); setPhotoOpen(null) }}
+        >
           <img className="lightbox-img" src={photoOpen} alt="pit" />
         </div>
       )}
