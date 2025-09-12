@@ -257,4 +257,5 @@ button, input, select, textarea { color: inherit; font: inherit; }
   .row.counter .label { flex: 1 1 auto; min-width: 0; }
   .segment-row .btn.segment { flex: 1 1 calc(33% - 8px); min-width: 0; }
   .statusline .event { display: none; }
+  .logo { height: 32px; width: auto; }
 }
