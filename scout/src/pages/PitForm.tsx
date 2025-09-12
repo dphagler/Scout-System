@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { putPit } from '../db'
-import { SettingsContext } from '../settings'
+import { SettingsContext, toApiBase } from '../settings'
 import { getGameForEvent } from '../gameConfig'
 import { useTeamsMeta } from '../hooks/useTeamsMeta'
 
@@ -19,6 +19,8 @@ export default function PitForm() {
   const { settings } = React.useContext(SettingsContext)
   const game = getGameForEvent(settings.eventKey)
   const schemaVersion = Number((game as any)?.schema) || 1
+  const base = toApiBase(settings.syncUrl)
+  const exportHref = `${base}/pit_export_csv.php?event=${encodeURIComponent(settings.eventKey)}&key=${encodeURIComponent(settings.apiKey)}`
 
   // Local form state
   const [teamNumber, setTeamNumber] = useState<number | ''>('')
@@ -67,7 +69,10 @@ export default function PitForm() {
 
   return (
     <div className="container">
-      <h2>{game.name} - Pit Scouting</h2>
+      <div className="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+        <h2>{game.name} - Pit Scouting</h2>
+        <a className="btn" href={exportHref}>Export CSV</a>
+      </div>
 
       {/* Team + basics */}
       <div className="card">
