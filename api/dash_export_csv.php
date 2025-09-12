@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename="team_averages.csv"');
-require __DIR__ . '/config.php';
+require_once __DIR__ . '/config.php';
 cors_preflight();
 
 $clientKey = client_api_key();
