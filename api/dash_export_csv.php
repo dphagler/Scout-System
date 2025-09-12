@@ -24,10 +24,10 @@ $metricKeys = $js['stats']['metrics_keys'] ?? [];
 
 $fh = fopen('php://output', 'w');
 $headers = array_merge(['team_number','nickname','played'], array_map(function($k){ return "avg_" . $k; }, $metricKeys));
-fputcsv($fh, $headers);
+fputcsv($fh, $headers, ',', chr(34), '\\');
 foreach ($teams as $t) {
   $row = [$t['team_number'], $t['nickname'] ?? '', $t['played'] ?? 0];
   foreach ($metricKeys as $k) { $row[] = $t['avg'][$k] ?? 0; }
-  fputcsv($fh, $row);
+  fputcsv($fh, $row, ',', chr(34), '\\');
 }
 fclose($fh);
