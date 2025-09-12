@@ -55,9 +55,17 @@ try {
     if ($mj) {
       $m = is_string($mj) ? json_decode($mj, true) : $mj;
       if (is_array($m)) {
-        if (isset($m['endgame'])) { $eg = is_string($m['endgame']) ? $m['endgame'] : (string)$m['endgame']; }
-        elseif (isset($m['end'])) { $eg = is_string($m['end']) ? $m['end'] : (string)$m['end']; }
-        elseif (isset($m['climb'])) { $eg = is_string($m['climb']) ? $m['climb'] : (string)$m['climb']; }
+        if (isset($m['endgame'])) {
+          $eg = is_string($m['endgame']) ? $m['endgame'] : (string)$m['endgame'];
+        } elseif (isset($m['endgame_climb'])) {
+          $eg = is_string($m['endgame_climb']) ? $m['endgame_climb'] : (string)$m['endgame_climb'];
+        } elseif (isset($m['endgame_status'])) {
+          $eg = is_string($m['endgame_status']) ? $m['endgame_status'] : (string)$m['endgame_status'];
+        } elseif (isset($m['end'])) {
+          $eg = is_string($m['end']) ? $m['end'] : (string)$m['end'];
+        } elseif (isset($m['climb'])) {
+          $eg = is_string($m['climb']) ? $m['climb'] : (string)$m['climb'];
+        }
       }
     }
     $rec['endgame'] = $eg;
@@ -111,12 +119,9 @@ try {
       if (!is_array($obj)) continue;
 
       // endgame
-      $eg = null;
-      if (isset($obj['endgame'])) { $eg = $obj['endgame']; }
-      elseif (isset($obj['endgame_climb'])) { $eg = $obj['endgame_climb']; }
-      elseif (isset($obj['endgame_status'])) { $eg = $obj['endgame_status']; }
+      $eg = $obj['endgame'] ?? $obj['endgame_climb'] ?? $obj['endgame_status'] ?? null;
       if ($eg !== null && $eg !== '') {
-        $k = strtolower(trim((string)$eg));
+        $k = trim((string)$eg);
         $endgamePct[$k] = ($endgamePct[$k] ?? 0) + 1;
       }
 
