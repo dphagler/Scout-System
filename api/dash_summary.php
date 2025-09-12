@@ -123,11 +123,12 @@ try {
         $select_pct[$k][$val] = round(100.0*$cnt/$played,1);
       }
     }
-    if (isset($select_pct['endgame'])) {
-      $end_pct = $select_pct['endgame'];
-    } else {
-      $end_pct = $select_pct['endgame_climb'] ?? $select_pct['endgame_status'] ?? [];
-    }
+    $select_pct['endgame'] = $select_pct['endgame']
+      ?? $select_pct['endgame_climb']
+      ?? $select_pct['endgame_status']
+      ?? [];
+    unset($select_pct['endgame_climb'], $select_pct['endgame_status']);
+    $end_pct = $select_pct['endgame'];
     $card_pct = []; foreach ($agg['card'] as $k=>$cnt) { $card_pct[$k] = round(100.0*$cnt/$played,1); }
 
     $teams[] = [
