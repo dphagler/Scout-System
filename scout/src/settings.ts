@@ -93,8 +93,9 @@ export const defaultSettings: Settings = normalizeSettings({
 // Public context
 export const SettingsContext = React.createContext<{
   settings: Settings
-  setSettings: (s: Settings) => void
+  setSettings: React.Dispatch<React.SetStateAction<Settings>>
 }>({
   settings: defaultSettings,
-  setSettings: () => {}
+  // cast default setter to any to satisfy context initialization
+  setSettings: (() => {}) as any
 })

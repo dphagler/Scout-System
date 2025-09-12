@@ -3,6 +3,7 @@ import MatchForm from './pages/MatchForm'
 import PitForm from './pages/PitForm'
 import Dashboard from './pages/Dashboard'
 import { SettingsContext, defaultSettings, normalizeSettings, toApiBase } from './settings'
+import type { Settings } from './settings'
 import logoImg from './assets/Commodore_Horizontal_Logo.png'
 import { getAll } from './db'
 import type { PitRecord, MatchRecord } from './db'
@@ -226,7 +227,19 @@ export default function App() {
                 <label>Event Key</label>
                 <input
                   value={settings.eventKey}
-                  onChange={e => setSettings({ ...settings, eventKey: e.target.value })}
+                  onChange={e => {
+                    const val = e.target.value
+                    setSettings((prev: Settings) => {
+                      const next = { ...prev, eventKey: val }
+                      const norm = normalizeSettings(next)
+                      try {
+                        localStorage.setItem('scout:settings', JSON.stringify(norm))
+                        localStorage.setItem('scout:scoutName', norm.scoutName)
+                        localStorage.setItem('scout:matchNumber', String(norm.matchNumber))
+                      } catch {}
+                      return next
+                    })
+                  }}
                   placeholder="e.g., 2025gaalb"
                 />
               </div>
@@ -234,7 +247,19 @@ export default function App() {
                 <label>API Base</label>
                 <input
                   value={settings.syncUrl}
-                  onChange={e => setSettings({ ...settings, syncUrl: e.target.value })}
+                  onChange={e => {
+                    const val = e.target.value
+                    setSettings((prev: Settings) => {
+                      const next = { ...prev, syncUrl: val }
+                      const norm = normalizeSettings(next)
+                      try {
+                        localStorage.setItem('scout:settings', JSON.stringify(norm))
+                        localStorage.setItem('scout:scoutName', norm.scoutName)
+                        localStorage.setItem('scout:matchNumber', String(norm.matchNumber))
+                      } catch {}
+                      return next
+                    })
+                  }}
                   placeholder="https://www.commodorerobotics.com/api"
                 />
               </div>
@@ -243,7 +268,19 @@ export default function App() {
                 <input
                   type="password"
                   value={settings.apiKey}
-                  onChange={e => setSettings({ ...settings, apiKey: e.target.value })}
+                  onChange={e => {
+                    const val = e.target.value
+                    setSettings((prev: Settings) => {
+                      const next = { ...prev, apiKey: val }
+                      const norm = normalizeSettings(next)
+                      try {
+                        localStorage.setItem('scout:settings', JSON.stringify(norm))
+                        localStorage.setItem('scout:scoutName', norm.scoutName)
+                        localStorage.setItem('scout:matchNumber', String(norm.matchNumber))
+                      } catch {}
+                      return next
+                    })
+                  }}
                   placeholder="(secret)"
                 />
               </div>
@@ -257,11 +294,22 @@ export default function App() {
                 <button className="btn" onClick={() => adminPullEvent(true)} title="Re-import even if event exists">
                   Force re-import
                 </button>
-                <button className="btn" onClick={() => {
-                  const url = new URL(window.location.href)
-                  url.searchParams.delete('admin')
-                  window.location.href = url.toString()
-                }}>Close Admin</button>
+                <button
+                  className="btn"
+                  onClick={() => {
+                    const norm = normalizeSettings(settings)
+                    try {
+                      localStorage.setItem('scout:settings', JSON.stringify(norm))
+                      localStorage.setItem('scout:scoutName', norm.scoutName)
+                      localStorage.setItem('scout:matchNumber', String(norm.matchNumber))
+                    } catch {}
+                    const url = new URL(window.location.href)
+                    url.searchParams.delete('admin')
+                    window.location.href = url.toString()
+                  }}
+                >
+                  Close Admin
+                </button>
               </div>
             </div>
 
