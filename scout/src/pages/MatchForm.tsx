@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { putMatch } from '../db'
 import { SettingsContext } from '../settings'
+import type { Settings } from '../settings'
 import { getGameForEvent } from '../gameConfig'
 import { getCachedSchedule, ScheduleMatch } from '../schedule'
 import { useTeamsMeta } from '../hooks/useTeamsMeta'
@@ -133,7 +134,11 @@ export default function MatchForm() {
         <div className="grid">
           <div className="field">
             <label>Scout</label>
-            <input value={settings.scoutName} onChange={e => setSettings({ ...settings, scoutName: e.target.value })} placeholder="Your name" />
+            <input
+              value={settings.scoutName}
+              onChange={e => setSettings((prev: Settings) => ({ ...prev, scoutName: e.target.value }))}
+              placeholder="Your name"
+            />
           </div>
 
           <div className="field">
@@ -146,7 +151,7 @@ export default function MatchForm() {
                   onClick={() => {
                     const a = sid.startsWith('red') ? 'red' : 'blue'
                     const n = sid.endsWith('1') ? '1' : sid.endsWith('2') ? '2' : '3'
-                    setSettings({ ...settings, alliance: a as Alliance, station: n })
+                    setSettings((prev: Settings) => ({ ...prev, alliance: a as Alliance, station: n }))
                   }}
                 >
                   {sid.startsWith('red') ? 'Red' : 'Blue'} {sid.slice(-1)}
@@ -158,9 +163,32 @@ export default function MatchForm() {
           <div className="field">
             <label>Match #</label>
             <div className="row nowrap">
-              <button className="btn" onClick={() => { const n = Math.max(1, localMatch - 1); setLocalMatch(n); setSettings({ ...settings, matchNumber: n }) }}>-</button>
-              <input inputMode="numeric" value={localMatch} onChange={e => { const n = Math.max(1, Number(e.target.value || 1)); setLocalMatch(n); setSettings({ ...settings, matchNumber: n }) }} placeholder="1" />
-              <button className="btn" onClick={() => { const n = localMatch + 1; setLocalMatch(n); setSettings({ ...settings, matchNumber: n }) }}>+</button>
+              <button
+                className="btn"
+                onClick={() => {
+                  const n = Math.max(1, localMatch - 1)
+                  setLocalMatch(n)
+                  setSettings((prev: Settings) => ({ ...prev, matchNumber: n }))
+                }}
+              >-</button>
+              <input
+                inputMode="numeric"
+                value={localMatch}
+                onChange={e => {
+                  const n = Math.max(1, Number(e.target.value || 1))
+                  setLocalMatch(n)
+                  setSettings((prev: Settings) => ({ ...prev, matchNumber: n }))
+                }}
+                placeholder="1"
+              />
+              <button
+                className="btn"
+                onClick={() => {
+                  const n = localMatch + 1
+                  setLocalMatch(n)
+                  setSettings((prev: Settings) => ({ ...prev, matchNumber: n }))
+                }}
+              >+</button>
             </div>
           </div>
 
@@ -298,7 +326,7 @@ export default function MatchForm() {
             alert(teamNumber ? `Saved for Team ${labelForTeam(teamNumber, teamMeta)}` : 'Saved locally')
             const nextMatch = localMatch + 1
             setLocalMatch(nextMatch)
-            setSettings({ ...settings, matchNumber: nextMatch })
+            setSettings((prev: Settings) => ({ ...prev, matchNumber: nextMatch }))
           }}
         >
           Save
