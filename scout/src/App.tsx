@@ -207,7 +207,7 @@ export default function App() {
 
         <div className="spacer" />
 
-        <div className="statusline" style={{ marginRight: 8 }}>
+        <div className="statusline">
           <span className="scout">Scout: {settings.scoutName || '-'}</span>
           <span className="event"> | Event: {settings.eventKey || '-'}</span>
         </div>
