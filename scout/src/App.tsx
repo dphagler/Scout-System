@@ -308,7 +308,8 @@ export default function App() {
                     } catch {}
                     const url = new URL(window.location.href)
                     url.searchParams.delete('admin')
-                    window.location.href = url.toString()
+                    setTab('match')
+                    window.history.replaceState(null, '', url.toString())
                   }}
                 >
                   Close Admin
