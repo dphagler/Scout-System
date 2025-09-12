@@ -47,6 +47,10 @@ export default function App() {
       try {
         const saved = localStorage.getItem('scout:settings')
         const parsed = saved ? JSON.parse(saved) : {}
+        const savedName = localStorage.getItem('scout:scoutName')
+        if (savedName) parsed.scoutName = savedName
+        const savedMatch = localStorage.getItem('scout:matchNumber')
+        if (savedMatch) parsed.matchNumber = Number(savedMatch)
         const merged = normalizeSettings(fillBlanks(parsed))
         setSettings(merged)
       } catch {
@@ -66,6 +70,8 @@ export default function App() {
       }
       const norm = normalizeSettings(filled)
       localStorage.setItem('scout:settings', JSON.stringify(norm))
+      localStorage.setItem('scout:scoutName', norm.scoutName)
+      localStorage.setItem('scout:matchNumber', String(norm.matchNumber))
       if (JSON.stringify(norm) !== JSON.stringify(settings)) setSettings(norm)
     } catch {}
   }, [settings, envDefaults])
@@ -113,7 +119,6 @@ export default function App() {
       alert(`Sync failed: ${e?.message || e}`)
     } finally {
       setSyncBusy(false)
-      setTimeout(() => setSyncHint(''), 12000)
     }
   }
 
@@ -151,7 +156,6 @@ export default function App() {
         if (teamCount > 0 && matchCount > 0) {
           setSyncHint(`Event already present (${teamCount} teams, ${matchCount} matches). Use Force re-import if needed.`)
           await Promise.all([refreshTeamsCache(), refreshScheduleCache()])
-          setTimeout(()=>setSyncHint(''), 9000)
           return
         }
       }
@@ -184,7 +188,6 @@ export default function App() {
       const matchesImported = (imported.matches ?? (imported.stats?.matches)) ?? 'OK'
       setSyncHint(`Event pulled: teams=${teamsImported}, matches=${matchesImported}`)
       window.dispatchEvent(new CustomEvent('scout:cache-updated', { detail: { kind: 'event-import', eventKey: settings.eventKey } }))
-      setTimeout(()=>setSyncHint(''), 12000)
     } catch (e: any) {
       setSyncHint(`Pull failed: ${e?.message || e}`)
       alert(`Pull failed: ${e?.message || e}`)
@@ -270,12 +273,25 @@ export default function App() {
       )}
 
       {showSyncModal && (
-        <div className="modal-backdrop">
-          <div className="modal">
+        <div
+          className="modal-backdrop"
+          onClick={() => {
+            if (!syncBusy) setSyncHint('')
+          }}
+        >
+          <div
+            className="modal"
+            onClick={e => e.stopPropagation()}
+          >
             <div className="header">
               <h3>Sync Status</h3>
             </div>
             <p>{syncHint || 'Syncing...'}</p>
+            {!syncBusy && (
+              <button className="btn" onClick={() => setSyncHint('')}>
+                Close
+              </button>
+            )}
           </div>
         </div>
       )}
