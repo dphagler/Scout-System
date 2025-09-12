@@ -296,6 +296,9 @@ export default function MatchForm() {
             setPenalties(0); setBrokeDown(false); setDefensePlayed(0); setDefendedBy(0); setDriverSkill(3); setCard('none')
 
             alert(teamNumber ? `Saved for Team ${labelForTeam(teamNumber, teamMeta)}` : 'Saved locally')
+            const nextMatch = localMatch + 1
+            setLocalMatch(nextMatch)
+            setSettings({ ...settings, matchNumber: nextMatch })
           }}
         >
           Save
