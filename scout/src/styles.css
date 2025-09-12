@@ -54,6 +54,9 @@ h1, h2, h3, h4, h5, h6,
   backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255,255,255,0.06);
 
+  /* allow wrapping on small screens */
+  flex-wrap: wrap;
+
   /* match container width without needing extra wrapper */
   max-width: 1000px;
   margin: 0 auto;
@@ -91,8 +94,15 @@ h1, h2, h3, h4, h5, h6,
   font-size: 0.9rem;
   white-space: nowrap;
 }
+.nav .statusline { margin-right: 8px; }
+
 @media (max-width: 640px) {
-  .statusline .event { display: none; }
+  .nav .statusline {
+    order: 1;
+    flex-basis: 100%;
+    margin: 4px 0 0;
+    text-align: center;
+  }
 }
 
 .footer {
