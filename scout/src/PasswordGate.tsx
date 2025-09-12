@@ -29,33 +29,28 @@ export default function PasswordGate({ children }: { children: React.ReactNode }
   if (authed) return <>{children}</>
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-      }}
-    >
-      <form
-        onSubmit={submit}
-        style={{ background: 'white', padding: '1rem', borderRadius: '4px' }}
-      >
-        <p>Please enter the password:</p>
-        <input
-          type="password"
-          value={pw}
-          onChange={e => setPw(e.target.value)}
-          style={{ marginBottom: '0.5rem', width: '100%' }}
-        />
-        {error && <div style={{ color: 'red', marginBottom: '0.5rem' }}>{error}</div>}
-        <button type="submit">Enter</button>
+    <div className="modal-backdrop">
+      <form className="modal" onSubmit={submit}>
+        <div className="field">
+          <label htmlFor="pw">Please enter the password:</label>
+          <input
+            id="pw"
+            type="password"
+            value={pw}
+            onChange={e => setPw(e.target.value)}
+            autoFocus
+          />
+        </div>
+        {error && (
+          <div className="error" role="alert">
+            {error}
+          </div>
+        )}
+        <div className="row" style={{ justifyContent: 'flex-end', marginTop: 8 }}>
+          <button type="submit" className="btn primary">
+            Enter
+          </button>
+        </div>
       </form>
     </div>
   )
