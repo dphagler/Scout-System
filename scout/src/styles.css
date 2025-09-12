@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Microgramma';
+  src: url('/fonts/MicrogrammaDEEBolExt-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #0f172a;
   --card: #111827;
@@ -18,6 +26,12 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial;
 }
 a { color: var(--ink); text-decoration: none; }
+
+h1, h2, h3, h4, h5, h6,
+.nav .tab {
+  font-family: 'Microgramma', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial;
+  font-weight: normal;
+}
 
 /* Layout */
 .container {
@@ -43,6 +57,10 @@ a { color: var(--ink); text-decoration: none; }
   /* match container width without needing extra wrapper */
   max-width: 1000px;
   margin: 0 auto;
+}
+.nav .logo {
+  height: 32px;
+  width: auto;
 }
 .nav .spacer { flex: 1; }
 

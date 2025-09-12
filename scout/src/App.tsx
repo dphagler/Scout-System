@@ -3,6 +3,7 @@ import MatchForm from './pages/MatchForm'
 import PitForm from './pages/PitForm'
 import Dashboard from './pages/Dashboard'
 import { SettingsContext, defaultSettings, normalizeSettings, toApiBase } from './settings'
+import logoImg from './assets/Commodore_Horizontal_Logo.png'
 import { getAll } from './db'
 import type { PitRecord, MatchRecord } from './db'
 import { refreshTeamsCache as refreshTeamsCacheUtil, refreshScheduleCache as refreshScheduleCacheUtil, syncUnsynced } from './sync'
@@ -192,6 +193,7 @@ export default function App() {
   return (
     <SettingsContext.Provider value={{ settings, setSettings }}>
       <div className="nav">
+        <img src={logoImg} alt="Commodore Robotics" className="logo" />
         <button className={`tab ${tab === 'match' ? 'active' : ''}`} onClick={() => setTab('match')}>Match</button>
         <button className={`tab ${tab === 'pit' ? 'active' : ''}`} onClick={() => setTab('pit')}>Pit</button>
         <button className={`tab ${tab === 'dash' ? 'active' : ''}`} onClick={() => setTab('dash')}>Dashboard</button>
