@@ -121,8 +121,8 @@ try {
       // endgame
       $eg = $obj['endgame'] ?? $obj['endgame_climb'] ?? $obj['endgame_status'] ?? null;
       if ($eg !== null && $eg !== '') {
-        $k = trim((string)$eg);
-        $endgamePct[$k] = ($endgamePct[$k] ?? 0) + 1;
+        $eg = strtolower(trim((string)$eg));
+        $endgamePct[$eg] = ($endgamePct[$eg] ?? 0) + 1;
       }
 
       // flags
