@@ -55,11 +55,14 @@ try {
           if (!isset($teamsAgg[$tnum]['metrics_sum'][$k])) $teamsAgg[$tnum]['metrics_sum'][$k] = 0;
           $teamsAgg[$tnum]['metrics_sum'][$k] += (float)$v;
           $metricsKeys[$k] = true;
-        } elseif (is_string($v) && $v !== '') {
-          if (!isset($teamsAgg[$tnum]['selects'][$k])) $teamsAgg[$tnum]['selects'][$k] = [];
-          if (!isset($teamsAgg[$tnum]['selects'][$k][$v])) $teamsAgg[$tnum]['selects'][$k][$v] = 0;
-          $teamsAgg[$tnum]['selects'][$k][$v] += 1;
-          $selectKeys[$k] = true;
+        } elseif (is_string($v)) {
+          $v = strtolower(trim((string)$v));
+          if ($v !== '') {
+            if (!isset($teamsAgg[$tnum]['selects'][$k])) $teamsAgg[$tnum]['selects'][$k] = [];
+            if (!isset($teamsAgg[$tnum]['selects'][$k][$v])) $teamsAgg[$tnum]['selects'][$k][$v] = 0;
+            $teamsAgg[$tnum]['selects'][$k][$v] += 1;
+            $selectKeys[$k] = true;
+          }
         }
       }
     }
@@ -77,12 +80,14 @@ try {
 
     // Legacy endgame column support
     $eg = $r['endgame'] ?? null;
-    if ($eg !== null && $eg !== '') {
-      $eg = is_string($eg) ? $eg : (string)$eg;
-      if (!isset($teamsAgg[$tnum]['selects']['endgame'])) $teamsAgg[$tnum]['selects']['endgame'] = [];
-      if (!isset($teamsAgg[$tnum]['selects']['endgame'][$eg])) $teamsAgg[$tnum]['selects']['endgame'][$eg] = 0;
-      $teamsAgg[$tnum]['selects']['endgame'][$eg] += 1;
-      $selectKeys['endgame'] = true;
+    if ($eg !== null) {
+      $eg = strtolower(trim((string)$eg));
+      if ($eg !== '') {
+        if (!isset($teamsAgg[$tnum]['selects']['endgame'])) $teamsAgg[$tnum]['selects']['endgame'] = [];
+        if (!isset($teamsAgg[$tnum]['selects']['endgame'][$eg])) $teamsAgg[$tnum]['selects']['endgame'][$eg] = 0;
+        $teamsAgg[$tnum]['selects']['endgame'][$eg] += 1;
+        $selectKeys['endgame'] = true;
+      }
     }
 
     $card = $r['card'] ?? 'none';
@@ -136,6 +141,8 @@ try {
     foreach ($agg['selects'] as $k=>$opts) {
       $select_pct[$k] = [];
       foreach ($opts as $val=>$cnt) {
+        $val = strtolower(trim((string)$val));
+        if ($val === '') continue;
         $select_pct[$k][$val] = round(100.0*$cnt/$played,1);
       }
     }
