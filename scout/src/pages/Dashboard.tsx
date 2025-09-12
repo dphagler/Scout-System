@@ -389,7 +389,7 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
               {detail?.endgame_pct && (
                 <ul>
                   {Object.entries(detail.endgame_pct as Record<string, number>).map(([k, v]: [string, number]) => (
-                    <li key={k} className="help">{`${k}: ${(v * 100).toFixed(0)}%`}</li>
+                    <li key={k} className="help">{`${k}: ${v.toFixed(1)}%`}</li>
                   ))}
                 </ul>
               )}
