@@ -7,7 +7,7 @@ header('Content-Type: application/json; charset=utf-8');
 try {
   require_api_key();
 
-  $event = isset($_GET['event']) ? trim($_GET['event']) : '';
+  $event = strtolower(trim($_GET['event'] ?? ''));
   $team  = isset($_GET['team'])  ? intval($_GET['team']) : 0;
 
   if ($event === '' || $team <= 0) {
