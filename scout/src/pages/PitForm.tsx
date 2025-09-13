@@ -217,6 +217,11 @@ export default function PitForm() {
             setNotes('')
             setPhotoBlobs([])
             alert(`Saved for Team ${labelForTeam(rec.teamNumber)}`)
+            window.dispatchEvent(
+              new CustomEvent('scout:cache-updated', {
+                detail: { kind: 'pit-save', eventKey: settings.eventKey }
+              })
+            )
           }}
         >
           Save
