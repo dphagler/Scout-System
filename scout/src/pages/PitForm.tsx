@@ -69,7 +69,7 @@ export default function PitForm() {
 
   return (
     <div className="container">
-      <div className="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="row between">
         <h2>{game.name} - Pit Scouting</h2>
         <a className="btn" href={exportHref}>Export CSV</a>
       </div>
@@ -115,9 +115,9 @@ export default function PitForm() {
           <div className="field">
             <label>Dimensions (H-W-L in)</label>
             <div className="row nowrap">
-              <input inputMode="numeric" placeholder="H" value={dims.h || ''} onChange={e => setDims({ ...dims, h: Number(e.target.value || 0) })} style={{ maxWidth: 80 }} />
-              <input inputMode="numeric" placeholder="W" value={dims.w || ''} onChange={e => setDims({ ...dims, w: Number(e.target.value || 0) })} style={{ maxWidth: 80 }} />
-              <input inputMode="numeric" placeholder="L" value={dims.l || ''} onChange={e => setDims({ ...dims, l: Number(e.target.value || 0) })} style={{ maxWidth: 80 }} />
+              <input className="max-w-80" inputMode="numeric" placeholder="H" value={dims.h || ''} onChange={e => setDims({ ...dims, h: Number(e.target.value || 0) })} />
+              <input className="max-w-80" inputMode="numeric" placeholder="W" value={dims.w || ''} onChange={e => setDims({ ...dims, w: Number(e.target.value || 0) })} />
+              <input className="max-w-80" inputMode="numeric" placeholder="L" value={dims.l || ''} onChange={e => setDims({ ...dims, l: Number(e.target.value || 0) })} />
             </div>
           </div>
         </div>
@@ -155,9 +155,9 @@ export default function PitForm() {
         </div>
 
         {photoBlobs.length > 0 && (
-          <div className="row" style={{ flexWrap: 'wrap', gap: 10 }}>
+          <div className="row">
             {photoBlobs.map((p, i) => (
-              <div key={i} className="row" style={{ gap: 8 }}>
+              <div key={i} className="row gap-8">
                 <Thumb blob={p.blob} alt={`photo ${i+1}`} />
                 <button className="btn" onClick={() => removePhoto(i)}>Remove</button>
               </div>

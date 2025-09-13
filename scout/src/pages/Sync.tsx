@@ -93,7 +93,7 @@ export default function SyncPage() {
 
       <div className="card">
         <h4>Log</h4>
-        <div className="muted" style={{ whiteSpace: 'pre-wrap' }}>
+        <div className="muted pre-wrap">
           {log.length ? log.join('\n') : '—'}
         </div>
       </div>

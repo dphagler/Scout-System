@@ -48,7 +48,7 @@ export default function PasswordGate({ children }: { children: React.ReactNode }
             {error}
           </div>
         )}
-        <div className="row" style={{ justifyContent: 'flex-end', marginTop: 8 }}>
+        <div className="row justify-end mt-8">
           <button type="submit" className="btn primary">
             Enter
           </button>
