@@ -232,7 +232,7 @@ export default function Dashboard() {
         {error && <div className="error" role="alert">Error: {error}</div>}
 
         {/* Column selector */}
-        <div className="card" style={{ marginTop: 8 }}>
+        <div className="card">
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <div className="help">Columns: choose which averages to display</div>
             <div className="row">
