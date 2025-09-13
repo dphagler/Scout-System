@@ -5,9 +5,10 @@ import Dashboard from './pages/Dashboard'
 import { SettingsContext, defaultSettings, normalizeSettings, toApiBase } from './settings'
 import type { Settings } from './settings'
 import logoImg from './assets/logo.png'
-import { getAll } from './db'
+import { getAll, listUnsyncedCounts } from './db'
 import type { PitRecord, MatchRecord } from './db'
 import { refreshTeamsCache as refreshTeamsCacheUtil, refreshScheduleCache as refreshScheduleCacheUtil, syncUnsynced } from './sync'
+import './App.css'
 
 type Tab = 'match' | 'pit' | 'dash' | 'admin'
 
@@ -17,6 +18,7 @@ export default function App() {
   const [syncBusy, setSyncBusy] = React.useState(false)
   const [syncHint, setSyncHint] = React.useState<string>('')
   const showSyncModal = syncBusy || !!syncHint
+  const [unsyncedCount, setUnsyncedCount] = React.useState(0)
   const [envDefaults, setEnvDefaults] = React.useState({
     eventKey: import.meta.env.VITE_EVENT_KEY || '',
     syncUrl: '',
@@ -87,6 +89,19 @@ export default function App() {
   }, [])
 
   const base = toApiBase(settings.syncUrl || '')
+
+  React.useEffect(() => {
+    async function load() {
+      try {
+        const { pit, match } = await listUnsyncedCounts()
+        setUnsyncedCount(pit + match)
+      } catch {}
+    }
+    load()
+    function onCacheUpdated() { load() }
+    window.addEventListener('scout:cache-updated', onCacheUpdated as any)
+    return () => window.removeEventListener('scout:cache-updated', onCacheUpdated as any)
+  }, [])
 
   function refreshTeamsCache() {
     return (async () => {
@@ -212,7 +227,12 @@ export default function App() {
           <span className="event"> | Event: {settings.eventKey || '-'}</span>
         </div>
         <button className="btn" onClick={doUnifiedSync} disabled={syncBusy}>
-          {syncBusy ? 'Syncing...' : 'Sync'}
+          <span className="sync-text">
+            {syncBusy ? 'Syncing...' : 'Sync'}
+            {unsyncedCount > 0 && (
+              <span className="sync-badge">{unsyncedCount >= 10 ? '9+' : unsyncedCount}</span>
+            )}
+          </span>
         </button>
       </div>
 
