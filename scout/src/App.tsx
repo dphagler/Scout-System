@@ -8,7 +8,6 @@ import logoImg from './assets/logo.png'
 import { getAll, listUnsyncedCounts } from './db'
 import type { PitRecord, MatchRecord } from './db'
 import { refreshTeamsCache as refreshTeamsCacheUtil, refreshScheduleCache as refreshScheduleCacheUtil, syncUnsynced } from './sync'
-import './App.css'
 
 type Tab = 'match' | 'pit' | 'dash' | 'admin'
 
