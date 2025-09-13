@@ -16,7 +16,7 @@ type DashTeam = {
   penalties_avg?: number
   driver_skill_avg?: number
   defense_played_avg?: number
-  defended_by_avg?: number
+  defense_resilience_avg?: number
   broke_down_pct?: number
 }
 
@@ -102,7 +102,7 @@ export default function Dashboard() {
       { key: 'penalties', label: 'Penalties', percent: false },
       { key: 'broke_down', label: 'Broke Down', percent: true },
       { key: 'defense_played', label: 'Defense Played', percent: false },
-      { key: 'defended_by', label: 'Defended By', percent: false },
+      { key: 'defense_resilience', label: 'Defense Resilience', percent: false },
       { key: 'driver_skill', label: 'Driver Skill', percent: false },
     )
     return defs
@@ -180,7 +180,7 @@ export default function Dashboard() {
     if (k === 'penalties') return t.penalties_avg ?? 0
     if (k === 'driver_skill') return t.driver_skill_avg ?? 0
     if (k === 'defense_played') return t.defense_played_avg ?? 0
-    if (k === 'defended_by') return t.defended_by_avg ?? 0
+    if (k === 'defense_resilience') return t.defense_resilience_avg ?? 0
     if (k === 'broke_down') return t.broke_down_pct ?? 0
     const sel = selectMetricMap[k]
     if (sel) return t.select_pct?.[sel.field]?.[sel.option] ?? 0
@@ -394,7 +394,7 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
                 </ul>
               )}
               <p className="help">
-                Played: {detail?.played ?? 0} · Penalties Avg: {fmt(detail?.penalties_avg)} · Driver Avg: {fmt(detail?.driver_skill_avg)} · Broke Down Avg: {fmt(detail?.broke_down_avg)} · Defended By Avg: {fmt(detail?.defended_by_avg)} · Defense Played Avg: {fmt(detail?.defense_played_avg)}
+                Played: {detail?.played ?? 0} · Penalties Avg: {fmt(detail?.penalties_avg)} · Driver Avg: {fmt(detail?.driver_skill_avg)} · Broke Down Avg: {fmt(detail?.broke_down_avg)} · Defense Resilience Avg: {fmt(detail?.defense_resilience_avg)} · Defense Played Avg: {fmt(detail?.defense_played_avg)}
               </p>
               {detail?.cards && detail.cards.length > 0 && (
                 <p className="help">Cards: {detail.cards.join(', ')}</p>

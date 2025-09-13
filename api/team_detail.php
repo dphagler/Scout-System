@@ -38,7 +38,7 @@ try {
   $stmt = $pdo->prepare("
     SELECT match_key, alliance, position, team_number,
            metrics_json, penalties, broke_down,
-           defense_played, defended_by, driver_skill, card,
+           defense_played, defense_resilience, driver_skill, card,
            comments, scout_name, device_id, created_at_ms, schema_version
     FROM match_records
     WHERE team_number = ?
@@ -79,14 +79,14 @@ try {
       AVG(NULLIF(penalties, NULL))       AS penalties_avg,
       AVG(NULLIF(driver_skill, NULL))    AS driver_skill_avg,
       COALESCE(AVG(broke_down), 0)       AS broke_down_avg,
-      COALESCE(AVG(defended_by), 0)      AS defended_by_avg,
+      COALESCE(AVG(defense_resilience), 0) AS defense_resilience_avg,
       COALESCE(AVG(defense_played), 0)   AS defense_played_avg
     FROM match_records
     WHERE team_number = ?
       AND match_key LIKE CONCAT(?, '_%')
   ");
   $stmt->execute([$team, $event]);
-  $agg = $stmt->fetch() ?: ['played'=>0,'penalties_avg'=>null,'driver_skill_avg'=>null,'broke_down_avg'=>0,'defended_by_avg'=>0,'defense_played_avg'=>0];
+  $agg = $stmt->fetch() ?: ['played'=>0,'penalties_avg'=>null,'driver_skill_avg'=>null,'broke_down_avg'=>0,'defense_resilience_avg'=>0,'defense_played_avg'=>0];
 
   // --- Cards received (distinct)
   $stmt = $pdo->prepare("
@@ -177,7 +177,7 @@ try {
     'penalties_avg' => $agg['penalties_avg'] !== null ? round(floatval($agg['penalties_avg']), 2) : null,
     'driver_skill_avg' => $agg['driver_skill_avg'] !== null ? round(floatval($agg['driver_skill_avg']), 2) : null,
     'broke_down_avg' => round(floatval($agg['broke_down_avg'] ?? 0), 2),
-    'defended_by_avg' => round(floatval($agg['defended_by_avg'] ?? 0), 2),
+    'defense_resilience_avg' => round(floatval($agg['defense_resilience_avg'] ?? 0), 2),
     'defense_played_avg' => round(floatval($agg['defense_played_avg'] ?? 0), 2),
     'cards' => $cards,
     'flags_pct' => (object)$flagsPct,

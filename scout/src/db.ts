@@ -33,7 +33,7 @@ export type MatchRecord = {
   penalties?: number
   brokeDown?: boolean
   defensePlayed?: number
-  defendedBy?: number
+  defenseResilience?: number
   driverSkill?: number
   card?: 'none'|'yellow'|'red'
   comments?: string

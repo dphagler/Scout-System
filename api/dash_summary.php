@@ -39,7 +39,7 @@ try {
         'card' => [],
         'driver_skill_sum' => 0,
         'defense_played_sum' => 0,
-        'defended_by_sum' => 0,
+        'defense_resilience_sum' => 0,
         'broke_down_sum' => 0,
       ];
     }
@@ -96,7 +96,7 @@ try {
 
     $teamsAgg[$tnum]['driver_skill_sum'] += (int)($r['driver_skill'] ?? 0);
     $teamsAgg[$tnum]['defense_played_sum'] += (int)($r['defense_played'] ?? 0);
-    $teamsAgg[$tnum]['defended_by_sum'] += (int)($r['defended_by'] ?? 0);
+    $teamsAgg[$tnum]['defense_resilience_sum'] += (int)($r['defense_resilience'] ?? 0);
 
     $recent[] = [
       'match_key' => $r['match_key'], 'team_number' => $tnum, 'alliance' => $r['alliance'],
@@ -162,7 +162,7 @@ try {
       'penalties_avg' => round($agg['penalties_sum'] / $played, 2),
       'driver_skill_avg' => round($agg['driver_skill_sum'] / $played, 2),
       'defense_played_avg' => round($agg['defense_played_sum'] / $played, 2),
-      'defended_by_avg' => round($agg['defended_by_sum'] / $played, 2),
+      'defense_resilience_avg' => round($agg['defense_resilience_sum'] / $played, 2),
       'broke_down_pct' => round(100.0 * $agg['broke_down_sum'] / $played, 1),
     ];
   }

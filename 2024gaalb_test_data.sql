@@ -6,7 +6,7 @@ START TRANSACTION;
 -- Match records
 INSERT INTO match_records
 (match_key, alliance, position, team_number, metrics_json,
- penalties, broke_down, defense_played, defended_by, driver_skill,
+ penalties, broke_down, defense_played, defense_resilience, driver_skill,
  card, comments, scout_name, device_id, created_at_ms, schema_version)
 SELECT match_key,
        alliance,
@@ -32,7 +32,7 @@ SELECT match_key,
        RAND()<0.05 AS broke_down,
        CASE WHEN team_number IN (4509,5074) THEN FLOOR(RAND()*4)+2
             ELSE FLOOR(RAND()*3) END AS defense_played,
-       FLOOR(RAND()*4) AS defended_by,
+       FLOOR(RAND()*4) AS defense_resilience,
        FLOOR(RAND()*5)+1 AS driver_skill,
        CASE
          WHEN team_number=3329 AND match_number=14 THEN 'yellow'
