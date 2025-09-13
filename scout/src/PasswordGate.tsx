@@ -1,5 +1,6 @@
 import React from 'react'
 import { appConfig } from './appConfig'
+import logo from './assets/logo.png'
 
 const PASSWORD_TIMEOUT_MS = 3 * 60 * 60 * 1000 // 3 hours
 
@@ -31,6 +32,7 @@ export default function PasswordGate({ children }: { children: React.ReactNode }
   return (
     <div className="modal-backdrop">
       <form className="modal" onSubmit={submit}>
+        <img src={logo} alt="Commodore logo" className="logo" />
         <div className="field">
           <label htmlFor="pw">Please enter the password:</label>
           <input
