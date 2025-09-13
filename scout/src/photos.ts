@@ -36,6 +36,16 @@ export async function fileToWebPBlob(file: File, maxSize = 1600, quality = 0.8):
   return await res.blob()
 }
 
+// Helper returns both the compressed blob and its size in bytes
+export async function fileToWebPBlobWithSize(
+  file: File,
+  maxSize = 1600,
+  quality = 0.8
+): Promise<{ blob: Blob; size: number }> {
+  const blob = await fileToWebPBlob(file, maxSize, quality)
+  return { blob, size: blob.size }
+}
+
 function randHex(n = 4) {
   const bytes = new Uint8Array(n)
   crypto.getRandomValues(bytes)
