@@ -70,7 +70,9 @@ h1, h2, h3, h4, h5, h6,
 }
 /* Drop shadow for footer logo */
 .footer .logo {
-  filter: drop-shadow(0 0 6px rgba(0,0,0,0.6));
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 0 2px #2a2f3b);
 }
 .nav .spacer { flex: 1; }
 
@@ -114,11 +116,19 @@ h1, h2, h3, h4, h5, h6,
 
 .footer {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 8px 12px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 24px 0;
+  border-top: 1px solid #2a2f3b;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  text-align: center;
+}
+
+.footer-text {
+  color: var(--muted);
+  font-size: 0.8rem;
 }
 
 /* Modal (Dashboard team view) */
@@ -278,4 +288,6 @@ button, input, select, textarea { color: inherit; font: inherit; }
   .row.counter .label { flex: 1 1 auto; min-width: 0; }
   .segment-row .btn.segment { flex: 1 1 calc(33% - 8px); min-width: 0; }
   .logo { height: 32px; width: auto; }
+  .footer { padding: 16px 0; }
+  .footer .logo { height: 32px; }
 }
