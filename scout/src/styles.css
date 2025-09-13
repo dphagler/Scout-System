@@ -35,7 +35,7 @@ h1, h2, h3, h4, h5, h6,
 
 /* Layout */
 .container {
-  max-width: 1000px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 16px;
   overflow-x: hidden;
@@ -46,7 +46,7 @@ h1, h2, h3, h4, h5, h6,
 .footer {
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(8px);
-  max-width: 1000px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
