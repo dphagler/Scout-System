@@ -219,21 +219,21 @@ export default function Dashboard() {
   return (
     <div className="container">
       <div className="card">
-        <div className="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-          <h3 style={{ margin: 0 }}>Dashboard</h3>
+        <div className="row between">
+          <h3 className="no-margin">Dashboard</h3>
           <div>
             <button className="btn" onClick={load} disabled={loading}>{loading ? 'Loading…' : 'Refresh'}</button>
-            <a className="btn" href={exportHref} style={{ marginLeft: 8 }}>Export CSV</a>
+            <a className="btn ml-8" href={exportHref}>Export CSV</a>
           </div>
         </div>
-        <p className="help" style={{ marginTop: 8 }}>
+        <p className="help mt-8">
           Event: <strong>{settings.eventKey || '-'}</strong> · Teams: {data?.stats?.teams ?? '-'} · Matches: {data?.stats?.matches ?? '-'}
         </p>
         {error && <div className="error" role="alert">Error: {error}</div>}
 
         {/* Column selector */}
         <div className="card">
-          <div className="row" style={{ justifyContent: 'space-between' }}>
+          <div className="row between">
             <div className="help">Columns: choose which averages to display</div>
             <div className="row">
               <button className="btn" onClick={()=>setAllMetrics(true)}>All</button>
@@ -246,9 +246,9 @@ export default function Dashboard() {
             </div>
           </div>
           {showColumnChooser && (
-            <div className="row" style={{ gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
+            <div className="row gap-12 mt-8">
               {metrics.map(k => (
-                <label key={`m_${k}`} className="row" style={{ gap: 6 }}>
+                <label key={`m_${k}`} className="row gap-6">
                   <input type="checkbox" checked={visibleMetrics.includes(k)} onChange={()=>toggleMetric(k)} />
                   <span>{metricLabels[k] || k}</span>
                 </label>
@@ -258,8 +258,8 @@ export default function Dashboard() {
         </div>
 
         {/* Team table */}
-        <div style={{ overflowX: 'auto' }}>
-          <table className="table" style={{ minWidth: 720 }}>
+        <div className="overflow-x-auto">
+          <table className="table min-w-720">
             <thead>
               <tr>
                 <th className="clickable" onClick={()=>onSort('team_number')}>Team {sortKey==='team_number' ? (sortDir==='asc'?'▲':'▼') : ''}</th>
@@ -273,7 +273,7 @@ export default function Dashboard() {
             <tbody>
               {sortedTeams.map(t => (
                 <tr key={t.team_number}>
-                  <td><button className="btn" onClick={()=>setTeamOpen(t.team_number)} style={{ padding: '4px 8px' }}>{t.team_number}</button></td>
+                  <td><button className="btn small" onClick={()=>setTeamOpen(t.team_number)}>{t.team_number}</button></td>
                   <td><span className="clickable" onClick={()=>setTeamOpen(t.team_number)}>{t.nickname || ''}</span></td>
                   <td>{t.played}</td>
                   {visibleMetrics.map(k => {
@@ -360,13 +360,13 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
         <div className="header">
-          <h3 style={{ margin: 0 }}>Team {teamNumber} {detail?.meta?.nickname ? `— ${detail.meta.nickname}` : ''}</h3>
+          <h3 className="no-margin">Team {teamNumber} {detail?.meta?.nickname ? `— ${detail.meta.nickname}` : ''}</h3>
           <button className="close" onClick={onClose}>Close</button>
         </div>
         {loading && <p className="help">Loading…</p>}
         {error && <div className="error" role="alert">Error: {error}</div>}
-        {!loading && !error && (
-          <div className="grid two" style={{ marginTop: 12 }}>
+          {!loading && !error && (
+          <div className="grid two mt-12">
             <div>
               <h4>Pit</h4>
               <p className="help">Drivetrain: {pit?.drivetrain || '-'} · Weight: {pit?.weight_lb ?? '-'} lb</p>
@@ -374,7 +374,7 @@ function TeamModal({ teamNumber, onClose }: { teamNumber: number, onClose: () =>
               {mechs && (typeof mechs === 'object') && ('text' in mechs) && <p className="help">Mechanisms: {mechs.text}</p>}
               {pit?.notes && <p className="help">Notes: {pit.notes}</p>}
               {photos.length > 0 && (
-                <div className="row" style={{ marginTop: 8 }}>
+                <div className="row mt-8">
                   {photos.map((u,i)=>(<img key={i} src={u} alt="pit" className="thumb" onClick={()=>setPhotoOpen(u)} />))}
                 </div>
               )}

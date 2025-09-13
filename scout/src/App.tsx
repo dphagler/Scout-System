@@ -317,7 +317,7 @@ export default function App() {
               </div>
             </div>
 
-            <p className="help" style={{ marginTop: 8 }}>
+            <p className="help mt-8">
               Admin is hidden from nav. Open with <code>?admin=1</code>. "Pull Event Data" will create teams & schedule on the server if missing, then refresh the app cache.
             </p>
           </div>

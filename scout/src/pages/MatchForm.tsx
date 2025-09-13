@@ -214,7 +214,7 @@ export default function MatchForm() {
               const val = !!metrics[key]
               return (
                 <div className="row" key={key}>
-                  <label className="muted" style={{ minWidth: 160 }}>{f.label}</label>
+                  <label className="muted min-w-160">{f.label}</label>
                   <div className="qty">
                     <button className={`btn ${val ? 'primary' : ''}`} onClick={() => updateMetric(key, true)}>Yes</button>
                     <button className={`btn ${!val ? 'primary' : ''}`} onClick={() => updateMetric(key, false)}>No</button>
@@ -251,7 +251,7 @@ export default function MatchForm() {
         <h4>Discipline &amp; Status</h4>
         <CounterRow label="Penalties" value={penalties} onChange={(n)=>setPenalties(Number.isFinite(n) ? n : 0)} />
         <div className="row">
-          <label className="muted" style={{ minWidth: 160 }}>Broke Down</label>
+          <label className="muted min-w-160">Broke Down</label>
           <div className="qty">
             <button className={`btn ${brokeDown ? 'primary' : ''}`} onClick={() => setBrokeDown(true)}>Yes</button>
             <button className={`btn ${!brokeDown ? 'primary' : ''}`} onClick={() => setBrokeDown(false)}>No</button>
