@@ -350,6 +350,7 @@ export default function App() {
 
       <footer className="footer">
         <img src={logoImg} alt="Commodore Robotics" className="logo" />
+        <span className="footer-text">Commodore Robotics | FRC Team 6919</span>
       </footer>
     </SettingsContext.Provider>
   )
