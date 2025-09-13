@@ -1,7 +1,16 @@
 // Bump CACHE to force update
-const CACHE = 'scouting-shell-v10';
-// Only cache under /scout/ to avoid CORS from site root redirects
-const ASSETS = ['/scout/', '/scout/index.html'];
+const CACHE = 'scouting-shell-v11';
+// Precache app shell plus static assets loaded from other roots
+const ASSETS = [
+  '/scout/',
+  '/scout/index.html',
+  '/scout/manifest.webmanifest',
+  '/scout/icons/icon-192.png',
+  '/scout/icons/icon-512.png',
+  '/scout/fonts/MicrogrammaDEEBolExt-Regular.ttf'
+];
+// Paths we want the runtime cache handler to manage
+const CACHE_PATHS = ['/scout/', '/icons/', '/fonts/', '/api/'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -21,9 +30,9 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
-  // Runtime cache only for same-origin under /scout/
+  // Runtime cache only for same-origin requests under allowed paths
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin || !url.pathname.startsWith('/scout/')) return;
+  if (url.origin !== self.location.origin || !CACHE_PATHS.some(p => url.pathname.startsWith(p))) return;
   e.respondWith(
     caches.match(req).then(cached => cached || fetch(req).then(res => {
       const copy = res.clone();
