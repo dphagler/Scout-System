@@ -41,29 +41,36 @@ h1, h2, h3, h4, h5, h6,
   overflow-x: hidden;
 }
 
+/* Top nav & footer share visual treatment */
+.nav,
+.footer {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(8px);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
 /* Top nav — aligned to container width, no glow */
 .nav {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: rgba(255,255,255,0.05);
   position: sticky;
   top: 0;
   z-index: 5;
-  backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255,255,255,0.06);
 
   /* allow wrapping on small screens */
   flex-wrap: wrap;
-
-  /* match container width without needing extra wrapper */
-  max-width: 1000px;
-  margin: 0 auto;
 }
 .logo {
   height: 64px;
   width: auto;
+}
+/* Drop shadow for footer logo */
+.footer .logo {
+  filter: drop-shadow(0 0 6px rgba(0,0,0,0.6));
 }
 .nav .spacer { flex: 1; }
 
@@ -107,8 +114,11 @@ h1, h2, h3, h4, h5, h6,
 
 .footer {
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 16px;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 /* Modal (Dashboard team view) */
