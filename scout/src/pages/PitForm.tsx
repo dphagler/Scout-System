@@ -5,7 +5,7 @@ import { getGameForEvent } from '../gameConfig'
 import { useTeamsMeta } from '../hooks/useTeamsMeta'
 import { fileToWebPBlobWithSize } from '../photos'
 
-const MAX_PHOTO_BYTES = 1_000_000 // ~1MB limit
+const MAX_PHOTO_BYTES = 5_000_000 // ~5MB limit
 
 // Tiny thumbnail from Blob
 function Thumb({ blob, alt }: { blob: Blob; alt: string }) {
@@ -76,7 +76,7 @@ export default function PitForm() {
         skipped++
       }
     }
-    if (skipped > 0) alert('Some photos were too large and were skipped.')
+    if (skipped > 0) alert('Some photos were too large (over 5MB) and were skipped.')
     if (items.length) setPhotoBlobs(prev => [...prev, ...items])
   }
 
@@ -167,7 +167,7 @@ export default function PitForm() {
           <input type="file" accept="image/*" capture="environment" multiple onChange={e => onPickPhotos(e.target.files)} />
           {photoBlobs.length > 0
             ? <div className="help">{photoBlobs.length} photo{photoBlobs.length > 1 ? 's' : ''} queued</div>
-            : <div className="help">You can add up to 3 photos. They'll upload when you Sync.</div>
+            : <div className="help">You can add up to 3 photos (each under 5MB). They'll upload when you Sync.</div>
           }
         </div>
 

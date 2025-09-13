@@ -29,12 +29,19 @@ export async function refreshScheduleCache(eventKey: string, apiKey: string, syn
 export async function uploadPitPhotos(records: PitRecord[], settings: { eventKey: string; apiKey: string; syncUrl: string }): Promise<{ uploaded: number; failed: number }> {
   let uploaded = 0, failed = 0
   const base = toApiBase(settings.syncUrl)
+  const MAX_BYTES = 5_000_000 // ~5MB limit
   for (const rec of records) {
     ;(rec as any).photos = Array.isArray((rec as any).photos) ? (rec as any).photos : []
     while (rec.photoBlobs && rec.photoBlobs.length > 0) {
       const item = rec.photoBlobs[0]
       try {
         const webp: Blob = await fileToWebPBlob(item.blob as File, 1600, 0.86)
+        if (webp.size > MAX_BYTES) {
+          console.warn('Pit photo too large, skipping', { size: webp.size, name: (item as any)?.name })
+          failed++
+          rec.photoBlobs.shift()
+          continue
+        }
         const ext = '.webp'
         const stamp = Date.now()
         const rand = Math.random().toString(16).slice(2,10)
