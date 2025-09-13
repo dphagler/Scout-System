@@ -40,7 +40,7 @@ foreach ($selectOpts as $field => $opts) {
   foreach (array_keys($opts) as $opt) { $headers[] = "pct_{$field}:{$opt}"; }
 }
 $headers = array_merge($headers, [
-  'penalties_avg','driver_skill_avg','defense_played_avg','defended_by_avg','broke_down_pct'
+  'penalties_avg','driver_skill_avg','defense_played_avg','defense_resilience_avg','broke_down_pct'
 ]);
 fputcsv($fh, $headers, ',', chr(34), '\\');
 foreach ($teams as $t) {
@@ -54,7 +54,7 @@ foreach ($teams as $t) {
   $row[] = $t['penalties_avg'] ?? 0;
   $row[] = $t['driver_skill_avg'] ?? 0;
   $row[] = $t['defense_played_avg'] ?? 0;
-  $row[] = $t['defended_by_avg'] ?? 0;
+  $row[] = $t['defense_resilience_avg'] ?? 0;
   $row[] = $t['broke_down_pct'] ?? 0;
   fputcsv($fh, $row, ',', chr(34), '\\');
 }

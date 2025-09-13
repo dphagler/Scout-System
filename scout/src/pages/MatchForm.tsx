@@ -109,7 +109,7 @@ export default function MatchForm() {
   const [penalties, setPenalties] = useState(0)
   const [brokeDown, setBrokeDown] = useState(false)
   const [defensePlayed, setDefensePlayed] = useState(0)
-  const [defendedBy, setDefendedBy] = useState(0)
+  const [defenseResilience, setDefenseResilience] = useState(0)
   const [driverSkill, setDriverSkill] = useState(3)
   const [card, setCard] = useState<'none'|'yellow'|'red'>('none')
 
@@ -123,7 +123,7 @@ export default function MatchForm() {
     return false
   }
   function resetDiscipline() {
-    setPenalties(0); setBrokeDown(false); setDefensePlayed(0); setDefendedBy(0); setDriverSkill(3); setCard('none')
+    setPenalties(0); setBrokeDown(false); setDefensePlayed(0); setDefenseResilience(0); setDriverSkill(3); setCard('none')
   }
 
   return (
@@ -262,8 +262,8 @@ export default function MatchForm() {
           <input type="range" min={0} max={5} step={1} value={defensePlayed} onChange={e => setDefensePlayed(parseInt(e.target.value, 10))} />
         </div>
         <div className="field">
-          <label>Defended By: <span className="muted">{defendedBy}</span></label>
-          <input type="range" min={0} max={5} step={1} value={defendedBy} onChange={e => setDefendedBy(parseInt(e.target.value, 10))} />
+          <label>Defense Resilience: <span className="muted">{defenseResilience}</span></label>
+          <input type="range" min={0} max={5} step={1} value={defenseResilience} onChange={e => setDefenseResilience(parseInt(e.target.value, 10))} />
         </div>
         <div className="field">
           <label>Driver Skill: <span className="muted">{driverSkill}</span></label>
@@ -293,7 +293,7 @@ export default function MatchForm() {
           onClick={async () => {
             const _pen = Math.max(0, Number.isFinite(penalties) ? Math.floor(penalties) : 0)
             const _defPlayed = Math.max(0, Math.min(5, Number.isFinite(defensePlayed) ? Math.floor(defensePlayed) : 0))
-            const _defBy = Math.max(0, Math.min(5, Number.isFinite(defendedBy) ? Math.floor(defendedBy) : 0))
+            const _defRes = Math.max(0, Math.min(5, Number.isFinite(defenseResilience) ? Math.floor(defenseResilience) : 0))
             const _drv = Math.max(1, Math.min(5, Number.isFinite(driverSkill) ? Math.floor(driverSkill) : 3))
 
             const { notes, ...metricsForSave } = metrics
@@ -308,7 +308,7 @@ export default function MatchForm() {
               penalties: _pen,
               brokeDown,
               defensePlayed: _defPlayed,
-              defendedBy: _defBy,
+              defenseResilience: _defRes,
               driverSkill: _drv,
               card,
               comments: String(metrics['notes'] ?? '') || undefined,
@@ -321,7 +321,7 @@ export default function MatchForm() {
 
             // reset UI
             setMetrics(initialMetrics)
-            setPenalties(0); setBrokeDown(false); setDefensePlayed(0); setDefendedBy(0); setDriverSkill(3); setCard('none')
+            setPenalties(0); setBrokeDown(false); setDefensePlayed(0); setDefenseResilience(0); setDriverSkill(3); setCard('none')
 
             alert(teamNumber ? `Saved for Team ${labelForTeam(teamNumber, teamMeta)}` : 'Saved locally')
             const nextMatch = localMatch + 1

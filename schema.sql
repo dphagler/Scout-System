@@ -58,7 +58,7 @@ CREATE TABLE `match_records` (
   `penalties` int(10) UNSIGNED DEFAULT NULL,
   `broke_down` tinyint(1) DEFAULT NULL,
   `defense_played` tinyint(3) UNSIGNED DEFAULT NULL,
-  `defended_by` tinyint(3) UNSIGNED DEFAULT NULL,
+  `defense_resilience` tinyint(3) UNSIGNED DEFAULT NULL,
   `driver_skill` tinyint(3) UNSIGNED DEFAULT NULL,
   `card` varchar(16) DEFAULT NULL,
   `comments` text DEFAULT NULL,

@@ -1,7 +1,7 @@
 DELETE FROM match_records WHERE match_key LIKE '2025gaalb%';
 DELETE FROM pit_records WHERE event_key='2025gaalb';
 
-INSERT INTO match_records (match_key, alliance, position, team_number, metrics_json, penalties, broke_down, defense_played, defended_by, driver_skill, card, comments, scout_name, device_id, created_at_ms, schema_version) VALUES
+INSERT INTO match_records (match_key, alliance, position, team_number, metrics_json, penalties, broke_down, defense_played, defense_resilience, driver_skill, card, comments, scout_name, device_id, created_at_ms, schema_version) VALUES
 ('2025gaalb_qm1','red','red1',1002,'{"auto_coral_L1": 0, "auto_coral_L2": 0, "auto_coral_L3": 0, "auto_coral_L4": 1, "auto_algae_scored": 1, "auto_mobility": true, "teleop_coral_L1": 1, "teleop_coral_L2": 1, "teleop_coral_L3": 2, "teleop_coral_L4": 4, "teleop_algae_scored": 2, "teleop_dropped": 1, "endgame_climb": "none", "coop": true}',0,1,2,2,3,'none','generated','AutoGen','dev_sim',0,2),
 ('2025gaalb_qm1','red','red2',4240,'{"auto_coral_L1": 0, "auto_coral_L2": 2, "auto_coral_L3": 2, "auto_coral_L4": 1, "auto_algae_scored": 1, "auto_mobility": false, "teleop_coral_L1": 2, "teleop_coral_L2": 1, "teleop_coral_L3": 1, "teleop_coral_L4": 2, "teleop_algae_scored": 0, "teleop_dropped": 2, "endgame_climb": "none", "coop": false}',1,0,0,1,2,'none','generated','AutoGen','dev_sim',0,2),
 ('2025gaalb_qm1','red','red3',5828,'{"auto_coral_L1": 2, "auto_coral_L2": 0, "auto_coral_L3": 1, "auto_coral_L4": 2, "auto_algae_scored": 0, "auto_mobility": true, "teleop_coral_L1": 1, "teleop_coral_L2": 0, "teleop_coral_L3": 0, "teleop_coral_L4": 1, "teleop_algae_scored": 0, "teleop_dropped": 1, "endgame_climb": "none", "coop": false}',0,0,2,0,4,'none','generated','AutoGen','dev_sim',0,2),

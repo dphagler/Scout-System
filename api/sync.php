@@ -143,12 +143,12 @@ if (!empty($match)) {
     INSERT INTO match_records
       (match_key, alliance, position, team_number,
        metrics_json,
-       penalties, broke_down, defense_played, defended_by, driver_skill, card, comments,
+       penalties, broke_down, defense_played, defense_resilience, driver_skill, card, comments,
        scout_name, device_id, created_at_ms, schema_version)
     VALUES
       (:match_key, :alliance, :position, :team_number,
        :metrics_json,
-       :penalties, :broke_down, :defense_played, :defended_by, :driver_skill, :card, :comments,
+       :penalties, :broke_down, :defense_played, :defense_resilience, :driver_skill, :card, :comments,
        :scout_name, :device_id, :created_at_ms, :schema_version)
     ON DUPLICATE KEY UPDATE
        alliance        = VALUES(alliance),
@@ -157,7 +157,7 @@ if (!empty($match)) {
        penalties       = VALUES(penalties),
        broke_down      = VALUES(broke_down),
        defense_played  = VALUES(defense_played),
-       defended_by     = VALUES(defended_by),
+       defense_resilience = VALUES(defense_resilience),
        driver_skill    = VALUES(driver_skill),
        card            = VALUES(card),
        comments        = VALUES(comments),
@@ -188,7 +188,7 @@ if (!empty($match)) {
     $penalties    = to_int($r['penalties'] ?? 0);
     $broke_down   = to_bool01($r['brokeDown'] ?? 0);
     $def_played   = to_int($r['defensePlayed'] ?? 0);
-    $def_by       = to_int($r['defendedBy'] ?? 0);
+    $def_resilience = to_int($r['defenseResilience'] ?? 0);
     $driver_skill = to_int($r['driverSkill'] ?? 0);
     $card         = to_str_or_null($r['card'] ?? null);
     $comments     = to_str_or_null($r['comments'] ?? null);
@@ -207,7 +207,7 @@ if (!empty($match)) {
       ':penalties'      => $penalties,
       ':broke_down'     => $broke_down,
       ':defense_played' => $def_played,
-      ':defended_by'    => $def_by,
+      ':defense_resilience' => $def_resilience,
       ':driver_skill'   => $driver_skill,
       ':card'           => $card,
       ':comments'       => $comments,
