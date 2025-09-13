@@ -154,14 +154,17 @@ export default function Dashboard() {
   }
 
   // Quick presets inferred from metric names
-  function applyPreset(name: 'Scoring'|'Auto'|'Teleop'|'Endgame') {
+  function applyPreset(name: 'Driving'|'Auto'|'Teleop'|'Endgame') {
     const m = metrics
     let sel: string[] = []
     const has = (k: string, re: RegExp) => re.test(k.toLowerCase())
     if (name === 'Auto') sel = m.filter(k => has(k, /auto/))
     else if (name === 'Teleop') sel = m.filter(k => has(k, /tele|teleop|tp|driver/))
-    else if (name === 'Endgame') sel = m.filter(k => has(k, /end|endgame|climb|hang|park|coop/))
-    else sel = m.filter(k => has(k, /score|pts|point|coral|algae|amp|speaker|ring|note|cube|cone|goal|high|mid|low/))
+    else if (name === 'Endgame') sel = m
+      .filter(k => has(k, /end|endgame|climb|hang|park|coop/))
+      .filter(k => k !== 'endgame:none')
+    else sel = ['defense_played', 'defense_resilience', 'driver_skill', 'penalties', 'broke_down']
+      .filter(k => m.includes(k))
     setVisibleMetrics(sel)
   }
 
@@ -235,7 +238,7 @@ export default function Dashboard() {
             <div className="row">
               <button className="btn" onClick={()=>setAllMetrics(true)}>All</button>
               <button className="btn" onClick={()=>setAllMetrics(false)}>None</button>
-              <button className="btn" onClick={()=>applyPreset('Scoring')}>Scoring</button>
+              <button className="btn" onClick={()=>applyPreset('Driving')}>Driving</button>
               <button className="btn" onClick={()=>applyPreset('Auto')}>Auto</button>
               <button className="btn" onClick={()=>applyPreset('Teleop')}>Teleop</button>
               <button className="btn" onClick={()=>applyPreset('Endgame')}>Endgame</button>
