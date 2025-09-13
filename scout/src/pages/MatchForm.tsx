@@ -322,8 +322,12 @@ export default function MatchForm() {
             // reset UI
             setMetrics(initialMetrics)
             setPenalties(0); setBrokeDown(false); setDefensePlayed(0); setDefenseResilience(0); setDriverSkill(3); setCard('none')
-
             alert(teamNumber ? `Saved for Team ${labelForTeam(teamNumber, teamMeta)}` : 'Saved locally')
+            window.dispatchEvent(
+              new CustomEvent('scout:cache-updated', {
+                detail: { kind: 'match-save', eventKey: settings.eventKey }
+              })
+            )
             const nextMatch = localMatch + 1
             setLocalMatch(nextMatch)
             setSettings((prev: Settings) => ({ ...prev, matchNumber: nextMatch }))
