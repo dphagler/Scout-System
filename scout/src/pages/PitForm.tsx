@@ -3,6 +3,9 @@ import { putPit } from '../db'
 import { SettingsContext, toApiBase } from '../settings'
 import { getGameForEvent } from '../gameConfig'
 import { useTeamsMeta } from '../hooks/useTeamsMeta'
+import { fileToWebPBlobWithSize } from '../photos'
+
+const MAX_PHOTO_BYTES = 1_000_000 // ~1MB limit
 
 // Tiny thumbnail from Blob
 function Thumb({ blob, alt }: { blob: Blob; alt: string }) {
@@ -59,8 +62,22 @@ export default function PitForm() {
     const max = Math.max(0, 3 - photoBlobs.length)
     if (max <= 0) return
     const picked = Array.from(files).slice(0, max)
-    const items = picked.map(f => ({ name: f.name, blob: f }))
-    setPhotoBlobs(prev => [...prev, ...items])
+    const items: { name: string; blob: Blob }[] = []
+    let skipped = 0
+    for (const f of picked) {
+      try {
+        const { blob, size } = await fileToWebPBlobWithSize(f, 1600, 0.86)
+        if (size > MAX_PHOTO_BYTES) {
+          skipped++
+          continue
+        }
+        items.push({ name: f.name, blob })
+      } catch {
+        skipped++
+      }
+    }
+    if (skipped > 0) alert('Some photos were too large and were skipped.')
+    if (items.length) setPhotoBlobs(prev => [...prev, ...items])
   }
 
   function removePhoto(i: number) {
